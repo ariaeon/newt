@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import './App.css'
-import { setup } from './scripts/setup.ts'
-import { draw } from './scripts/constraint/draw.ts'; 
+import { setup } from './canvas/setup.ts'
+import { draw } from './canvas/scenes/constraint.ts'; 
 
 function App() {
 
