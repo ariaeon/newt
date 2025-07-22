@@ -9,5 +9,7 @@ export function setup(drawfn: (canvas: HTMLCanvasElement, ctx: CanvasRenderingCo
         return;
     }
     setCtx(ctx);
+    // Starts loop
     drawfn(canvas, ctx);
 }
+

@@ -1,14 +1,36 @@
-import { drawCircle } from './../helpers.ts';
+import { drawFrameWrapper } from '../drawFrameWrapper.ts';
+import { constrainDistance, drawCircle } from './../helpers.ts';
 
-let x = 0; // Track position outside the draw function
-const velocity = 2;
+const mousePos = { x: 0, y: 0 }; 
+let dotPos = { x: 0, y: 0 }; 
+const length = 25; 
 
-export function draw(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); 
+export function drawContent() {
+    drawCircle({
+        x: mousePos.x,
+        y: mousePos.y, 
+        radius: length,
+        strokeColor: "#FFFFFF",
+    });
 
-    drawCircle(x + 25, 40 + 25, 25, "#FF0000");
+    const distance = Math.hypot(mousePos.x - dotPos.x, mousePos.y - dotPos.y);
 
-    x += velocity;
+    if( distance > length) {
+        dotPos = constrainDistance(dotPos, mousePos, length);
+    }
+    
+    drawCircle({
+        x: dotPos.x,
+        y: dotPos.y, 
+        radius: 5,
+        fillColor: "#FFFFFF",
+    });
+}
 
-    requestAnimationFrame(() => draw(canvas, ctx)); 
+export const draw = drawFrameWrapper(drawContent);
+
+// TODO revisit mouse handler event
+onmousemove = (event: MouseEvent) => {
+    mousePos.x = event.clientX;
+    mousePos.y = event.clientY;
 }
