@@ -1,8 +1,8 @@
 // Wrapper for clearing & recalling
-export function drawFrameWrapper(drawfn: (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => void) {
-    return function draw(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+export function drawFrameWrapper(drawfn: () => void, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+    return function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawfn(canvas, ctx);
-        requestAnimationFrame(() => draw(canvas, ctx));
+        drawfn();
+        requestAnimationFrame(draw);
     };
 }

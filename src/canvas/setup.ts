@@ -1,8 +1,8 @@
-import { setCtx } from "./canvasContext";
+import { setCanvas, setCtx } from "./canvasContext";
 import { drawFrameWrapper } from "./drawFrameWrapper";
 
 
-export function setup(drawfn: (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => void) {
+export function setup(drawfn: () => void) {
     const canvas: HTMLCanvasElement  = document.getElementById("canvas") as HTMLCanvasElement;
     if (!canvas) {
         console.error("Failed to get canvas element");
@@ -21,8 +21,9 @@ export function setup(drawfn: (canvas: HTMLCanvasElement, ctx: CanvasRenderingCo
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
     setCtx(ctx);
+    setCanvas(canvas);
 
     // Starts loop
-    drawFrameWrapper(() => drawfn(canvas, ctx))(canvas, ctx);
+    drawFrameWrapper(drawfn, canvas, ctx)();
 }
 
