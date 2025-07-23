@@ -1,4 +1,4 @@
-import { constrainDistance, drawCircle } from "./../helpers.ts";
+import { constrainDistance, drawCircle } from './../helpers.ts';
 
 const length = 25;
 const segments = [
@@ -18,7 +18,7 @@ export function draw() {
     x: segments[0].x,
     y: segments[0].y,
     radius: length,
-    strokeColor: "#FFFFFF",
+    strokeColor: '#FFFFFF',
   });
 
   for (let i = 1; i < segments.length; i++) {
@@ -35,7 +35,7 @@ export function draw() {
       x: segments[i].x,
       y: segments[i].y,
       radius: length,
-      strokeColor: "#FFFFFF",
+      strokeColor: '#FFFFFF',
     });
   }
 }
