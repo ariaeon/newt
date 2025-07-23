@@ -1,28 +1,22 @@
 import type { Segment } from '@/types.ts';
 import { constrainDistance, drawCircle } from './../helpers.ts';
+import { getConfig } from '@/store/utils';
 
-const length = 25;
-const segments: Segment[] = [
-  { x: 0, y: 0, size: 30 },
-  { x: 0, y: 0, size: 40 },
-  { x: 0, y: 0, size: 45 },
-  { x: 0, y: 0, size: 50 },
-  { x: 0, y: 0, size: 45 },
-  { x: 0, y: 0, size: 40 },
-  { x: 0, y: 0, size: 35 },
-  { x: 0, y: 0, size: 30 },
-  { x: 0, y: 0, size: 20 },
-  { x: 0, y: 0, size: 15 },
-  { x: 0, y: 0, size: 12.5 },
-  { x: 0, y: 0, size: 10 },
-];
+const config = getConfig();
+const { segmentDistance, segmentLength, segmentSizes, strokeColor } = config;
+
+const segments: Segment[] = Array.from({ length: segmentLength }, (_, i) => ({
+  x: 0,
+  y: 0,
+  size: segmentSizes[i] || segmentSizes[segmentSizes.length - 1],
+}));
 
 export function draw() {
   drawCircle({
     x: segments[0].x,
     y: segments[0].y,
-    radius: length,
-    strokeColor: '#FFFFFF',
+    radius: segmentDistance,
+    strokeColor,
   });
 
   for (let i = 1; i < segments.length; i++) {
@@ -31,18 +25,22 @@ export function draw() {
       segments[i - 1].y - segments[i].y
     );
 
-    if (distance > length) {
+    if (distance > segmentDistance) {
       segments[i] = {
-        ...constrainDistance(segments[i], segments[i - 1], length),
-        size: segments[i].size || length,
+        ...segments[i],
+        ...constrainDistance(
+          segments[i],
+          segments[i - 1],
+          config.segmentDistance
+        ),
       };
     }
 
     drawCircle({
       x: segments[i].x,
       y: segments[i].y,
-      radius: segments[i].size || length,
-      strokeColor: '#FFFFFF',
+      radius: segments[i].size,
+      strokeColor,
     });
   }
 }
