@@ -4,8 +4,11 @@ import { Slider } from './base/slider';
 import { Input } from './base/input';
 import { Button } from './base/button';
 import { Minus } from 'lucide-react';
+import { Checkbox } from './base/checkbox';
+import { useConfigStore } from '@/store';
 
 function ControlPanel() {
+  const config = useConfigStore((state) => state.config);
   return (
     <Card className="absolute top-4 left-4 w-full max-w-sm">
       <CardContent>
@@ -25,8 +28,13 @@ function ControlPanel() {
                 min={1}
                 max={50}
                 step={1}
-                defaultValue={[50]}
                 className="w-full"
+                onValueChange={(value: number[]) => {
+                  useConfigStore.getState().setConfig({
+                    segmentLength: value[0],
+                  });
+                }}
+                value={[config.segmentLength]}
               />
             </div>
             <div className="grid gap-4">
@@ -36,8 +44,13 @@ function ControlPanel() {
                 min={20}
                 max={100}
                 step={1}
-                defaultValue={[50]}
                 className="w-full"
+                onValueChange={(value: number[]) => {
+                  useConfigStore.getState().setConfig({
+                    segmentDistance: value[0],
+                  });
+                }}
+                value={[config.segmentDistance]}
               />
             </div>
           </div>
@@ -54,11 +67,16 @@ function ControlPanel() {
                 <Input
                   id="strokeWidth"
                   type="number"
-                  defaultValue="2"
                   className="w-full"
                   min={1}
                   max={10}
                   step={1}
+                  value={config.strokeWidth}
+                  onChange={(e) => {
+                    useConfigStore.getState().setConfig({
+                      strokeWidth: Number(e.target.value),
+                    });
+                  }}
                 />
               </div>
               <div className="grid gap-4 w-1/2">
@@ -66,31 +84,41 @@ function ControlPanel() {
                 <Input
                   id="strokeColor"
                   type="color"
-                  defaultValue="#FFFFFF"
                   className="w-full"
+                  value={config.strokeColor}
+                  onChange={(e) => {
+                    useConfigStore.getState().setConfig({
+                      strokeColor: e.target.value,
+                    });
+                  }}
                 />
               </div>
             </div>
             <div className="flex gap-6">
               <div className="grid gap-4 w-1/2">
-                <Label htmlFor="strokeWidth">Stroke width</Label>
-                <Input
-                  id="strokeWidth"
-                  type="number"
-                  defaultValue="2"
-                  className="w-full"
-                  min={1}
-                  max={10}
-                  step={1}
+                <Label htmlFor="fillBool">Fill </Label>
+                <Checkbox
+                  id="fillBool"
+                  checked={config.fillBool}
+                  onCheckedChange={(checked) => {
+                    useConfigStore.getState().setConfig({
+                      fillBool: !!checked,
+                    });
+                  }}
                 />
               </div>
               <div className="grid gap-4 w-1/2">
-                <Label htmlFor="strokeColor">Stroke color</Label>
+                <Label htmlFor="fillColor">Fill color</Label>
                 <Input
-                  id="strokeColor"
+                  id="fillColor"
                   type="color"
-                  defaultValue="#FFFFFF"
                   className="w-full"
+                  value={config.fillColor}
+                  onChange={(e) => {
+                    useConfigStore.getState().setConfig({
+                      fillColor: e.target.value,
+                    });
+                  }}
                 />
               </div>
             </div>

@@ -1,20 +1,24 @@
 import { useEffect, useRef } from 'react';
 import './App.css';
 import { setup } from './canvas/setup.ts';
-import { draw } from './canvas/scenes/chain.ts';
+import { createScene } from './canvas/scenes/chain.ts';
 import ControlPanel from './components/ControlPanel.tsx';
+import { useConfigStore } from '@/store';
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    function handleResize() {
-      setup(draw);
-    }
-    handleResize();
-    window.addEventListener('resize', handleResize);
+    const drawFn = createScene();
+    setup(drawFn);
+    const unsub = useConfigStore.subscribe(() => {
+      const drawFn = createScene();
+      setup(drawFn);
+    });
+    window.addEventListener('resize', () => setup(drawFn));
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', () => setup(drawFn));
+      unsub();
     };
   }, []);
 
