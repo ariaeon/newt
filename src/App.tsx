@@ -8,24 +8,19 @@ function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    function resizeCanvas() {
-      const canvas = canvasRef.current;
-      if (canvas) {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
+    function handleResize() {
+      setup(draw);
     }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    setup(draw);
+    handleResize();
+    window.addEventListener('resize', handleResize);
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
   return (
     <>
-      <canvas id="canvas" ref={canvasRef} style={{ display: 'block', width: '100vw', height: '100vh' }} />
+      <canvas id="canvas" ref={canvasRef} />
     </>
   );
 }

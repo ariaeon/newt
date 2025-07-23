@@ -1,11 +1,10 @@
-import { drawFrameWrapper } from '../drawFrameWrapper.ts';
 import { constrainDistance, drawCircle } from './../helpers.ts';
 
 const mousePos = { x: 0, y: 0 }; 
 let dotPos = { x: 0, y: 0 }; 
 const length = 25; 
 
-export function drawContent() {
+export function draw() {
     drawCircle({
         x: mousePos.x,
         y: mousePos.y, 
@@ -26,8 +25,6 @@ export function drawContent() {
         fillColor: "#FFFFFF",
     });
 }
-
-export const draw = drawFrameWrapper(drawContent);
 
 // TODO revisit mouse handler event
 onmousemove = (event: MouseEvent) => {
