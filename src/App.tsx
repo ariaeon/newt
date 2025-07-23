@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import "./App.css";
 import { setup } from "./canvas/setup.ts";
-import { draw } from "./canvas/scenes/constraint.ts";
+import { draw } from "./canvas/scenes/chain.ts";
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
