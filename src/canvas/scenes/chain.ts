@@ -1,16 +1,20 @@
+import type { Segment } from '@/types.ts';
 import { constrainDistance, drawCircle } from './../helpers.ts';
 
 const length = 25;
-const segments = [
-  { x: 0, y: 0 },
-  { x: 0, y: 0 },
-  { x: 0, y: 0 },
-  { x: 0, y: 0 },
-  { x: 0, y: 0 },
-  { x: 0, y: 0 },
-  { x: 0, y: 0 },
-  { x: 0, y: 0 },
-  { x: 0, y: 0 },
+const segments: Segment[] = [
+  { x: 0, y: 0, size: 30 },
+  { x: 0, y: 0, size: 40 },
+  { x: 0, y: 0, size: 45 },
+  { x: 0, y: 0, size: 50 },
+  { x: 0, y: 0, size: 45 },
+  { x: 0, y: 0, size: 40 },
+  { x: 0, y: 0, size: 35 },
+  { x: 0, y: 0, size: 30 },
+  { x: 0, y: 0, size: 20 },
+  { x: 0, y: 0, size: 15 },
+  { x: 0, y: 0, size: 12.5 },
+  { x: 0, y: 0, size: 10 },
 ];
 
 export function draw() {
@@ -28,13 +32,16 @@ export function draw() {
     );
 
     if (distance > length) {
-      segments[i] = constrainDistance(segments[i], segments[i - 1], length);
+      segments[i] = {
+        ...constrainDistance(segments[i], segments[i - 1], length),
+        size: segments[i].size || length,
+      };
     }
 
     drawCircle({
       x: segments[i].x,
       y: segments[i].y,
-      radius: length,
+      radius: segments[i].size || length,
       strokeColor: '#FFFFFF',
     });
   }
