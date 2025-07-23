@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import './App.css';
 import { setup } from './canvas/setup.ts';
 import { draw } from './canvas/scenes/chain.ts';
+import ControlPanel from './components/ControlPanel.tsx';
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -19,9 +20,7 @@ function App() {
 
   return (
     <>
-      <div className="absolute top-4 left-4 border rounded-md padding-6 ">
-        Control panel{' '}
-      </div>
+      <ControlPanel />
       <canvas id="canvas" ref={canvasRef} className="canvas" />
     </>
   );
