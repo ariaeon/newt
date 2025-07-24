@@ -10,7 +10,10 @@ import { useConfigStore } from '@/store';
 function ControlPanel() {
   const config = useConfigStore((state) => state.config);
   return (
-    <Card className="absolute top-4 left-4 w-full max-w-sm">
+    <Card
+      className="absolute top-4 left-4 w-full max-w-sm"
+      onMouseDown={(e) => e.stopPropagation()}
+    >
       <CardContent>
         <h2 className="text-2xl mb-2">Control panel</h2>
         <form>

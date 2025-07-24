@@ -9,7 +9,7 @@ interface DrawCircleOptions {
   fillColor?: string;
 }
 
-// TODO improve optional arguments? stroekColor OR fillColor should be required
+// TODO improve optional arguments? strokeColor OR fillColor should be required
 export function drawCircle({
   x,
   y,
