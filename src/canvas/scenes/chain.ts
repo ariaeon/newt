@@ -1,5 +1,9 @@
-import type { Segment } from '@/types.ts';
-import { constrainDistance, drawCircle } from './../helpers.ts';
+import type { Segment, Point } from '@/types.ts';
+import { drawCircle, drawBody } from './../helpers/draw.util';
+import {
+  calculateSegmentAnchors,
+  constrainDistance,
+} from './../helpers/math.util.ts';
 import { getConfig } from '@/store/utils';
 import type { ConfigState } from '@/store/index.ts';
 
@@ -19,6 +23,9 @@ function makeSegments(
 
 export function draw() {
   const config = getConfig();
+  const leftAnchors: Point[] = [];
+  const rightAnchors: Point[] = [];
+
   if (!segments || segments.length !== config.segmentLength) {
     segments = makeSegments(config, segments);
   }
@@ -36,17 +43,18 @@ export function draw() {
   });
 
   for (let i = 1; i < segments.length; i++) {
-    // const distance = Math.hypot(
-    //   segments[i - 1].x - segments[i].x,
-    //   segments[i - 1].y - segments[i].y
-    // );
+    const dx = segments[i].x - segments[i - 1].x;
+    const dy = segments[i].y - segments[i - 1].y;
+    const angle = Math.atan2(dy, dx); // radians
 
-    // if (distance > segmentDistance) {
     segments[i] = {
       ...segments[i],
       ...constrainDistance(segments[i], segments[i - 1], segmentDistance),
     };
-    // }
+
+    const { left, right } = calculateSegmentAnchors(segments[i], angle);
+    leftAnchors.push(left);
+    rightAnchors.push(right);
 
     drawCircle({
       x: segments[i].x,
@@ -57,6 +65,12 @@ export function draw() {
       fillColor: fillBool ? fillColor : undefined,
     });
   }
+
+  drawBody(
+    [...leftAnchors, ...rightAnchors.reverse()],
+    strokeColor,
+    strokeWidth
+  );
 }
 
 export function handleMouseMove(event: MouseEvent) {

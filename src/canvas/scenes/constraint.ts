@@ -1,4 +1,5 @@
-import { constrainDistance, drawCircle } from './../helpers.ts';
+import { drawCircle } from './../helpers/draw.util.ts';
+import { constrainDistance } from './../helpers/math.util.ts';
 
 const mousePos = { x: 0, y: 0 };
 let dotPos = { x: 0, y: 0 };
