@@ -5,6 +5,7 @@ interface DrawCircleOptions {
   y: number;
   radius: number;
   strokeColor?: string;
+  strokeWidth?: number;
   fillColor?: string;
 }
 
@@ -14,6 +15,7 @@ export function drawCircle({
   y,
   radius,
   strokeColor,
+  strokeWidth = 2,
   fillColor,
 }: DrawCircleOptions) {
   const ctx = getCtx();
@@ -22,6 +24,7 @@ export function drawCircle({
   ctx.arc(x, y, radius, 0, Math.PI * 2, false);
   if (strokeColor) {
     ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = strokeWidth;
     ctx.stroke();
   }
   if (fillColor) {

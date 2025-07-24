@@ -16,7 +16,12 @@ function ControlPanel() {
         <form>
           <div className="flex justify-between mt-8 mb-6">
             <h3 className="font-semibold ">Segments</h3>
-            <Button variant="ghost" size={'icon'}>
+            <Button
+              variant="ghost"
+              size={'icon'}
+              onClick={() => {}}
+              type="button"
+            >
               <Minus />
             </Button>
           </div>
@@ -25,8 +30,8 @@ function ControlPanel() {
               <Label htmlFor="segmentLength">Amount of segments</Label>
               <Slider
                 id="segmentLength"
-                min={1}
-                max={50}
+                min={5}
+                max={25}
                 step={1}
                 className="w-full"
                 onValueChange={(value: number[]) => {
@@ -41,8 +46,8 @@ function ControlPanel() {
               <Label htmlFor="segmentDistance">Segment distance</Label>
               <Slider
                 id="segmentDistance"
-                min={20}
-                max={100}
+                min={10}
+                max={50}
                 step={1}
                 className="w-full"
                 onValueChange={(value: number[]) => {
@@ -56,7 +61,12 @@ function ControlPanel() {
           </div>
           <div className="flex justify-between mt-8 mb-6">
             <h3 className="font-semibold ">Style</h3>
-            <Button variant="ghost" size={'icon'}>
+            <Button
+              variant="ghost"
+              size={'icon'}
+              onClick={() => {}}
+              type="button"
+            >
               <Minus />
             </Button>
           </div>

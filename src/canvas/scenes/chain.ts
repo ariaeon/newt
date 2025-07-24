@@ -4,7 +4,15 @@ import { getConfig } from '@/store/utils';
 
 export function createScene() {
   const config = getConfig();
-  const { segmentDistance, segmentLength, segmentSizes, strokeColor } = config;
+  const {
+    segmentDistance,
+    segmentLength,
+    segmentSizes,
+    strokeWidth,
+    strokeColor,
+    fillColor,
+    fillBool,
+  } = config;
 
   const segments: Segment[] = Array.from({ length: segmentLength }, (_, i) => ({
     x: 0,
@@ -12,6 +20,7 @@ export function createScene() {
     size: segmentSizes[i] || segmentSizes[segmentSizes.length - 1],
   }));
 
+  // TODO revisit mouse handler event, surprised this works
   onmousemove = (event: MouseEvent) => {
     segments[0].x = event.clientX;
     segments[0].y = event.clientY;
@@ -21,8 +30,9 @@ export function createScene() {
     drawCircle({
       x: segments[0].x,
       y: segments[0].y,
-      radius: segmentDistance,
+      radius: segments[0].size,
       strokeColor,
+      fillColor: fillBool ? fillColor : undefined,
     });
 
     for (let i = 1; i < segments.length; i++) {
@@ -47,9 +57,9 @@ export function createScene() {
         y: segments[i].y,
         radius: segments[i].size,
         strokeColor,
+        strokeWidth,
+        fillColor: fillBool ? fillColor : undefined,
       });
     }
   };
-
-  // TODO revisit mouse handler event
 }
