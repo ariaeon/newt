@@ -8,6 +8,11 @@ export interface ConfigState {
   strokeColor: string;
   fillBool: boolean;
   fillColor: string;
+  debug: {
+    drawAnchors: boolean;
+    drawSegments: boolean;
+    drawAngles: boolean;
+  };
 }
 
 interface ConfigStore {
@@ -24,6 +29,11 @@ export const useConfigStore = create<ConfigStore>((set) => ({
     strokeColor: '#FF0000',
     fillBool: false,
     fillColor: '#FFFFFF',
+    debug: {
+      drawAnchors: true,
+      drawSegments: true,
+      drawAngles: false,
+    },
   },
 
   setConfig: (config) =>

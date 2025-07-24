@@ -20,6 +20,7 @@ function ControlPanel() {
   const [showConfig, setShowConfig] = useState(true);
   const [showSegments, setShowSegments] = useState(true);
   const [showStyle, setShowStyle] = useState(true);
+  const [showDebug, setShowDebug] = useState(true);
   return (
     <Card
       className="absolute top-4 left-4 w-full max-w-sm"
@@ -153,6 +154,37 @@ function ControlPanel() {
                     />
                   </div>
                 </div>
+              </div>
+            )}
+
+            <div className="flex justify-between mt-8 mb-6">
+              <h3 className="font-semibold ">Debug</h3>
+              <Button
+                variant="ghost"
+                size={'icon'}
+                onClick={() => setShowDebug(!showDebug)}
+                type="button"
+                aria-label={showDebug ? 'Collapse Debug' : 'Expand Debug'}
+              >
+                {showDebug ? <Minus /> : <Plus />}
+              </Button>
+            </div>
+            {showDebug && config.debug && (
+              <div className="flex flex-col gap-4">
+                {Object.entries(config.debug).map(([key, value]) => (
+                  <div className="flex items-center gap-2" key={key}>
+                    <Checkbox
+                      id={`debug-${key}`}
+                      checked={!!value}
+                      onCheckedChange={(checked) =>
+                        updateConfig({
+                          debug: { ...config.debug, [key]: !!checked },
+                        })
+                      }
+                    />
+                    <Label htmlFor={`debug-${key}`}>{key}</Label>
+                  </div>
+                ))}
               </div>
             )}
           </form>

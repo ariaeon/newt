@@ -1,5 +1,10 @@
 import type { Segment, Point } from '@/types.ts';
-import { drawCircle, drawBody } from './../helpers/draw.util';
+import {
+  drawCircle,
+  drawBody,
+  visualiseDot,
+  visualiseAngle,
+} from './../helpers/draw.util';
 import {
   calculateSegmentAnchors,
   constrainDistance,
@@ -33,14 +38,24 @@ export function draw() {
   const { segmentDistance, strokeWidth, strokeColor, fillColor, fillBool } =
     config;
 
-  drawCircle({
-    x: segments[0].x,
-    y: segments[0].y,
-    radius: segments[0].size,
-    strokeColor,
-    fillColor: fillBool ? fillColor : undefined,
-    strokeWidth,
-  });
+  // Stuff for head, to revisit later
+  const headAngle = Math.atan2(
+    segments[1].y - segments[0].y,
+    segments[1].x - segments[0].x
+  );
+  const { left, right } = calculateSegmentAnchors(segments[0], headAngle);
+  leftAnchors.push(left);
+  rightAnchors.push(right);
+
+  config.debug.drawSegments &&
+    drawCircle({
+      x: segments[0].x,
+      y: segments[0].y,
+      radius: segments[0].size,
+      strokeColor,
+      fillColor: fillBool ? fillColor : undefined,
+      strokeWidth,
+    });
 
   for (let i = 1; i < segments.length; i++) {
     const dx = segments[i].x - segments[i - 1].x;
@@ -56,14 +71,19 @@ export function draw() {
     leftAnchors.push(left);
     rightAnchors.push(right);
 
-    drawCircle({
-      x: segments[i].x,
-      y: segments[i].y,
-      radius: segments[i].size,
-      strokeColor,
-      strokeWidth,
-      fillColor: fillBool ? fillColor : undefined,
-    });
+    config.debug.drawAnchors &&
+      (visualiseDot(left, '#FFFF00'), visualiseDot(right, '#FFFF00'));
+    config.debug.drawSegments &&
+      drawCircle({
+        x: segments[i].x,
+        y: segments[i].y,
+        radius: segments[i].size,
+        strokeColor,
+        strokeWidth,
+        fillColor: fillBool ? fillColor : undefined,
+      });
+    config.debug.drawAngles &&
+      visualiseAngle(segments[i], angle, segments[i].size, '#00FF00');
   }
 
   drawBody(
