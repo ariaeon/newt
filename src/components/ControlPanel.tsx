@@ -23,7 +23,7 @@ function ControlPanel() {
   const [showDebug, setShowDebug] = useState(true);
   return (
     <Card
-      className="absolute top-4 left-4 w-full max-w-sm"
+      className="absolute top-4 left-4 w-full max-w-sm max-h-[calc(100vh-2rem)] overflow-scroll"
       onMouseDown={(e) => e.stopPropagation()}
     >
       <CardContent>

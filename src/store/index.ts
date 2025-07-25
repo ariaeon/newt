@@ -12,7 +12,7 @@ export interface ConfigState {
     drawAnchors: boolean;
     drawSegments: boolean;
     drawAngles: boolean;
-    drawBody: boolean;
+    drawRigidBody: boolean;
   };
 }
 
@@ -27,14 +27,14 @@ export const useConfigStore = create<ConfigStore>((set) => ({
     segmentDistance: 25,
     segmentSizes: [30, 40, 45, 50, 45, 40, 35, 30, 20, 15, 12.5, 10],
     strokeWidth: 2,
-    strokeColor: '#FF0000',
+    strokeColor: '#00FFFF',
     fillBool: false,
     fillColor: '#FFFFFF',
     debug: {
       drawAnchors: true,
       drawSegments: true,
-      drawAngles: false,
-      drawBody: true,
+      drawAngles: true,
+      drawRigidBody: true,
     },
   },
 

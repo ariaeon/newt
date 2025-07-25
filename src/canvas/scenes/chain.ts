@@ -1,9 +1,10 @@
 import type { Segment, Point } from '@/types.ts';
 import {
   drawCircle,
-  drawBody,
+  drawBodyCurve,
   visualiseDot,
   visualiseAngle,
+  visualiseBodyRigid,
 } from './../helpers/draw.util';
 import {
   calculateSegmentAnchors,
@@ -47,17 +48,8 @@ export function draw() {
   leftAnchors.push(left);
   rightAnchors.push(right);
 
-  config.debug.drawSegments &&
-    drawCircle({
-      x: segments[0].x,
-      y: segments[0].y,
-      radius: segments[0].size,
-      strokeColor,
-      fillColor: fillBool ? fillColor : undefined,
-      strokeWidth,
-    });
-  config.debug.drawAnchors &&
-    (visualiseDot(left, '#FFFF00'), visualiseDot(right, '#FFFF00'));
+  drawDebugSegment(segments[0], config);
+  drawDebugAnchors(left, right, config);
 
   for (let i = 1; i < segments.length; i++) {
     const dx = segments[i].x - segments[i - 1].x;
@@ -73,33 +65,57 @@ export function draw() {
     leftAnchors.push(left);
     rightAnchors.push(right);
 
-    config.debug.drawAnchors &&
-      (visualiseDot(left, '#FFFF00'), visualiseDot(right, '#FFFF00'));
-    config.debug.drawSegments &&
-      drawCircle({
-        x: segments[i].x,
-        y: segments[i].y,
-        radius: segments[i].size,
-        strokeColor,
-        strokeWidth,
-        fillColor: fillBool ? fillColor : undefined,
-      });
-    config.debug.drawAngles &&
-      visualiseAngle(segments[i], angle, segments[i].size, '#00FF00');
+    drawDebugAnchors(left, right, config);
+    drawDebugSegment(segments[i], config);
+    drawDebugAngles(segments[i], angle, config);
   }
 
-  config.debug.drawBody &&
-    drawBody(
-      [...leftAnchors, ...rightAnchors.reverse()],
-      strokeColor,
-      strokeWidth,
-      fillBool ? fillColor : undefined
-    );
+  //DRAW BODY
+  const rightReversed = [...rightAnchors].reverse();
+  drawBodyCurve({
+    points: [...leftAnchors, ...rightReversed],
+    k: 1,
+    strokeColor,
+    strokeWidth,
+    fillColor: fillBool ? fillColor : undefined,
+  });
+  drawDebugBody([...leftAnchors, ...rightReversed], config);
 }
 
 export function handleMouseMove(event: MouseEvent) {
   if (segments && segments[0]) {
     segments[0].x = event.clientX;
     segments[0].y = event.clientY;
+  }
+}
+
+function drawDebugAnchors(left: Point, right: Point, config: ConfigState) {
+  if (config.debug.drawAnchors) {
+    visualiseDot(left, '#FFFF00', 3);
+    visualiseDot(right, '#FFFF00', 3);
+  }
+}
+
+function drawDebugSegment(segment: Segment, config: ConfigState) {
+  if (config.debug.drawSegments) {
+    drawCircle({
+      x: segment.x,
+      y: segment.y,
+      radius: segment.size,
+      strokeColor: '#FF0000',
+      strokeWidth: 1,
+    });
+  }
+}
+
+function drawDebugAngles(segment: Segment, angle: number, config: ConfigState) {
+  if (config.debug.drawAngles) {
+    visualiseAngle(segment, angle, segment.size, '#00FF00');
+  }
+}
+
+function drawDebugBody(bodyAnchors: Point[], config: ConfigState) {
+  if (config.debug.drawRigidBody) {
+    visualiseBodyRigid(bodyAnchors, '#FF0000', 1);
   }
 }

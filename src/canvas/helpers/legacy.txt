@@ -1,0 +1,121 @@
+
+export const AlphaType = {
+  Uniform: 0,
+  Chordal: 1,
+  Centripetal: 0.5,
+} as const;
+type AlphaType = (typeof AlphaType)[keyof typeof AlphaType];
+
+interface BezierSegment {
+  cp1: Point; // First control point
+  cp2: Point; // Second control point
+  end: Point; // End point (start point is the end of the previous segment)
+}
+
+/**
+ * Converts an array of points into a Catmull-Rom spline represented as Bezier segments.
+ * @param points Array of {x, y} points
+ * @param alpha Alpha parameter (0 for uniform, 0.5 for centripetal, 1 for chordal)
+ * @returns Array of Bezier segments for ctx.bezierCurveTo
+ */
+function catmullRomToBezier(
+  points: Point[],
+  alpha: AlphaType = AlphaType.Centripetal
+): BezierSegment[] {
+  if (points.length < 2) return [];
+
+  const result: BezierSegment[] = [];
+  const n = points.length;
+
+  // Helper to calculate distance between two points
+  const distance = (p1: Point, p2: Point): number => {
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  // Helper to calculate tj for parameterization
+  const getT = (ti: number, pi: Point, pj: Point): number => {
+    const dist = distance(pi, pj);
+    return ti + Math.pow(dist, alpha);
+  };
+
+  // Duplicate endpoints for open spline (clamped)
+  const p = [points[0], ...points, points[n - 1]];
+
+  // Loop so last segment ends at the last real point
+  // p.length = n + 2, so i in [1, n]
+  for (let i = 1; i < p.length - 2; i++) {
+    const p0 = p[i - 1];
+    const p1 = p[i];
+    const p2 = p[i + 1];
+    const p3 = p[i + 2];
+
+    // Calculate t values based on alpha parameterization
+    const t0 = 0;
+    const t1 = getT(t0, p0, p1);
+    const t2 = getT(t1, p1, p2);
+    const t3 = getT(t2, p2, p3);
+
+    // Avoid division by zero
+    if (t1 === t2 || t2 === t3) continue;
+
+    // Calculate control points for cubic Bezier
+    const dt = t2 - t1;
+    const dt0 = t1 - t0;
+    const dt2 = t3 - t2;
+
+    // Precompute common terms for optimization
+    const a = 1 / dt;
+    const b1 = ((t2 - t1) * a) / dt0;
+    const b2 = ((t2 - t1) * a) / dt2;
+
+    // Calculate Bezier control points
+    const cp1x = p1.x + (p2.x - p0.x) * b1;
+    const cp1y = p1.y + (p2.y - p0.y) * b1;
+    const cp2x = p2.x - (p3.x - p1.x) * b2;
+    const cp2y = p2.y - (p3.y - p1.y) * b2;
+
+    result.push({
+      cp1: { x: cp1x, y: cp1y },
+      cp2: { x: cp2x, y: cp2y },
+      end: { x: p2.x, y: p2.y },
+    });
+  }
+
+  return result;
+}
+
+/**
+ * Draws the Catmull-Rom spline as Bezier curves on a canvas.
+ * @param ctx Canvas rendering context
+ * @param points Array of {x, y} points
+ * @param alpha Alpha parameter for spline type
+ */
+export function drawCatmullRom(
+  ctx: CanvasRenderingContext2D,
+  points: Point[],
+  alpha: number
+): void {
+  if (points.length < 2) return;
+
+  const segments = catmullRomToBezier(points, alpha as AlphaType);
+
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+
+  for (const segment of segments) {
+    ctx.bezierCurveTo(
+      segment.cp1.x,
+      segment.cp1.y,
+      segment.cp2.x,
+      segment.cp2.y,
+      segment.end.x,
+      segment.end.y
+    );
+  }
+  ctx.closePath();
+  ctx.strokeStyle = '#0000FF'; // Default stroke color
+  ctx.lineWidth = 1; // Default line width
+  ctx.stroke();
+}

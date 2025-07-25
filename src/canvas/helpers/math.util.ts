@@ -40,18 +40,3 @@ export function calculateSegmentAnchors(
   const right = { x: rx, y: ry };
   return { left, right };
 }
-
-// export function calculateHeadAnchors(
-//   segment: Segment,
-//   angle: number
-// ): { left: Point; right: Point } {
-//   const rx = parametricCircle(segment, segment.size, angle - Math.PI / 2).x;
-//   const ry = parametricCircle(segment, segment.size, angle - Math.PI / 2).y;
-//   const lx = parametricCircle(segment, segment.size, angle + Math.PI / 2).x;
-//   const ly = parametricCircle(segment, segment.size, angle + Math.PI / 2).y;
-
-//   const left = { x: lx, y: ly };
-//   const right = { x: rx, y: ry };
-//   return { left, right };
-
-// );
