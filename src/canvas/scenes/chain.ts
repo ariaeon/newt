@@ -56,6 +56,8 @@ export function draw() {
       fillColor: fillBool ? fillColor : undefined,
       strokeWidth,
     });
+  config.debug.drawAnchors &&
+    (visualiseDot(left, '#FFFF00'), visualiseDot(right, '#FFFF00'));
 
   for (let i = 1; i < segments.length; i++) {
     const dx = segments[i].x - segments[i - 1].x;
@@ -86,11 +88,13 @@ export function draw() {
       visualiseAngle(segments[i], angle, segments[i].size, '#00FF00');
   }
 
-  drawBody(
-    [...leftAnchors, ...rightAnchors.reverse()],
-    strokeColor,
-    strokeWidth
-  );
+  config.debug.drawBody &&
+    drawBody(
+      [...leftAnchors, ...rightAnchors.reverse()],
+      strokeColor,
+      strokeWidth,
+      fillBool ? fillColor : undefined
+    );
 }
 
 export function handleMouseMove(event: MouseEvent) {

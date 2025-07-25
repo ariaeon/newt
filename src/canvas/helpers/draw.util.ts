@@ -71,7 +71,8 @@ export function visualiseDot(
 export function drawBody(
   bodyAnchors: Point[],
   strokeColor: string,
-  strokeWidth: number
+  strokeWidth: number,
+  fillColor?: string
 ) {
   const ctx = getCtx();
   if (!ctx || bodyAnchors.length === 0) return;
@@ -83,5 +84,9 @@ export function drawBody(
   ctx.closePath();
   ctx.strokeStyle = strokeColor;
   ctx.lineWidth = strokeWidth;
+  if (fillColor) {
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+  }
   ctx.stroke();
 }

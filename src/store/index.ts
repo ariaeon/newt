@@ -12,6 +12,7 @@ export interface ConfigState {
     drawAnchors: boolean;
     drawSegments: boolean;
     drawAngles: boolean;
+    drawBody: boolean;
   };
 }
 
@@ -33,6 +34,7 @@ export const useConfigStore = create<ConfigStore>((set) => ({
       drawAnchors: true,
       drawSegments: true,
       drawAngles: false,
+      drawBody: true,
     },
   },
 
