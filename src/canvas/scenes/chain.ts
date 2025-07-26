@@ -12,6 +12,7 @@ import {
 } from './../helpers/math.util.ts';
 import { getConfig } from '@/store/utils';
 import type { ConfigState } from '@/store/index.ts';
+import { arraysEqual } from '@/util.ts';
 
 let segments: Segment[];
 
@@ -19,8 +20,8 @@ function makeSegments(
   config: ConfigState,
   prevSegments: Segment[] = []
 ): Segment[] {
-  const { segmentLength, segmentSizes } = config;
-  return Array.from({ length: segmentLength }, (_, i) => ({
+  const { segmentAmount, segmentSizes } = config;
+  return Array.from({ length: segmentAmount }, (_, i) => ({
     x: prevSegments[i]?.x || 0,
     y: prevSegments[i]?.y || 0,
     size: segmentSizes[i] || segmentSizes[segmentSizes.length - 1],
@@ -32,10 +33,16 @@ export function draw() {
   const leftAnchors: Point[] = [];
   const rightAnchors: Point[] = [];
 
-  if (!segments || segments.length !== config.segmentLength) {
+  if (
+    !segments ||
+    segments.length !== config.segmentAmount ||
+    !arraysEqual(
+      config.segmentSizes,
+      segments.map((s) => s.size)
+    )
+  ) {
     segments = makeSegments(config, segments);
   }
-
   const { segmentDistance, strokeWidth, strokeColor, fillColor, fillBool } =
     config;
 

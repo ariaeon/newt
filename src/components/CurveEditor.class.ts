@@ -2,7 +2,7 @@
 
 type Point = { x: number; y: number; id: number };
 
-export class CurveEditor {
+export class CurveEditorClass {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private points: Point[] = [

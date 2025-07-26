@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 export interface ConfigState {
-  segmentLength: number;
+  segmentAmount: number;
   segmentDistance: number;
   segmentSizes: number[];
   strokeWidth: number;
@@ -23,7 +23,7 @@ interface ConfigStore {
 
 export const useConfigStore = create<ConfigStore>((set) => ({
   config: {
-    segmentLength: 15,
+    segmentAmount: 15,
     segmentDistance: 25,
     segmentSizes: [30, 40, 45, 50, 45, 40, 35, 30, 20, 15, 12.5, 10],
     strokeWidth: 2,

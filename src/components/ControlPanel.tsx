@@ -67,9 +67,9 @@ function ControlPanel() {
                     step={1}
                     className="w-full"
                     onValueChange={(value: number[]) =>
-                      updateConfig({ segmentLength: value[0] })
+                      updateConfig({ segmentAmount: value[0] })
                     }
-                    value={[config.segmentLength]}
+                    value={[config.segmentAmount]}
                   />
                 </div>
                 <div className="grid gap-4">
