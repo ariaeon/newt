@@ -6,12 +6,10 @@ import {
   visualiseAngle,
   visualiseBodyRigid,
 } from './../helpers/draw.util';
-import {
-  calculateSegmentAnchors,
-  constrainDistance,
-} from './../helpers/math.util.ts';
+import { constrainDistance } from './../helpers/math.util.ts';
 import { getConfig } from '@/store/utils';
 import type { ConfigState } from '@/store/index.ts';
+import { getCustomAnchors, getSideAnchors } from '../helpers/anchors.util.ts';
 
 let segments: Point[];
 
@@ -42,16 +40,19 @@ export function draw() {
     segments[1].y - segments[0].y,
     segments[1].x - segments[0].x
   );
-  const { left, right } = calculateSegmentAnchors(
+  const headAnchors = getCustomAnchors(
     segments[0],
     config.segmentSizes[0],
-    headAngle
+    headAngle,
+    [Math.PI / 2, Math.PI * 0.75, Math.PI, -Math.PI * 0.75, -Math.PI / 2]
   );
-  leftAnchors.push(left);
-  rightAnchors.push(right);
+
+  leftAnchors.push(...headAnchors.reverse());
 
   drawDebugSegment(segments[0], config.segmentSizes[0], config);
-  drawDebugAnchors(left, right, config);
+  headAnchors.forEach((anchor) => {
+    drawDebugAnchors(anchor, config);
+  });
 
   for (let i = 1; i < segments.length; i++) {
     const dx = segments[i].x - segments[i - 1].x;
@@ -63,15 +64,18 @@ export function draw() {
       ...constrainDistance(segments[i], segments[i - 1], segmentDistance),
     };
 
-    const { left, right } = calculateSegmentAnchors(
+    // Use the generic one here maybe? less readable
+    const { left, right } = getSideAnchors(
       segments[i],
       config.segmentSizes[i],
       angle
     );
+
     leftAnchors.push(left);
     rightAnchors.push(right);
 
-    drawDebugAnchors(left, right, config);
+    drawDebugAnchors(left, config);
+    drawDebugAnchors(right, config);
     drawDebugSegment(segments[i], config.segmentSizes[i], config);
     drawDebugAngles(segments[i], config.segmentSizes[i], angle, config);
   }
@@ -95,10 +99,9 @@ export function handleMouseMove(event: MouseEvent) {
   }
 }
 
-function drawDebugAnchors(left: Point, right: Point, config: ConfigState) {
+function drawDebugAnchors(anchor: Point, config: ConfigState) {
   if (config.debug.drawAnchors) {
-    visualiseDot(left, '#FFFF00', 3);
-    visualiseDot(right, '#FFFF00', 3);
+    visualiseDot(anchor, '#FFFF00', 3);
   }
 }
 

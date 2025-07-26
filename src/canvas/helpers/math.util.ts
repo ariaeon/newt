@@ -1,10 +1,10 @@
 import type { Point } from '@/types';
 
 export function constrainDistance(
-  point: { x: number; y: number },
-  anchor: { x: number; y: number },
+  point: Point,
+  anchor: Point,
   distance: number
-): { x: number; y: number } {
+): Point {
   const dx = point.x - anchor.x;
   const dy = point.y - anchor.y;
   const len = Math.hypot(dx, dy);
@@ -17,27 +17,33 @@ export function constrainDistance(
 }
 
 export const parametricCircle = (
-  { x, y }: { x: number; y: number },
+  { x, y }: Point,
   radius: number,
   angle: number
-): { x: number; y: number } => {
+): Point => {
   return {
     x: x + radius * Math.cos(angle),
     y: y + radius * Math.sin(angle),
   };
 };
 
-export function calculateSegmentAnchors(
-  segment: Point,
-  size: number,
-  angle: number
-): { left: Point; right: Point } {
-  const rx = parametricCircle(segment, size, angle - Math.PI / 2).x;
-  const ry = parametricCircle(segment, size, angle - Math.PI / 2).y;
-  const lx = parametricCircle(segment, size, angle + Math.PI / 2).x;
-  const ly = parametricCircle(segment, size, angle + Math.PI / 2).y;
-
-  const left = { x: lx, y: ly };
-  const right = { x: rx, y: ry };
-  return { left, right };
+interface GetPointOnSegmentParams {
+  segment: Point;
+  distanceFromCenter: number;
+  segmentAngle: number;
+  offsetAngle: number;
 }
+
+// Just a wrapper to make the parametricCircle params more intuitive
+export const getPointOnSegment = ({
+  segment,
+  distanceFromCenter,
+  segmentAngle,
+  offsetAngle,
+}: GetPointOnSegmentParams): Point => {
+  return parametricCircle(
+    segment,
+    distanceFromCenter,
+    segmentAngle + offsetAngle
+  );
+};
