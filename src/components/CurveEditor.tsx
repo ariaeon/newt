@@ -4,11 +4,12 @@ import { useConfigStore } from '@/store';
 
 const CANVAS_WIDTH = 300;
 const CANVAS_HEIGHT = 300;
-const SCALE_FACTOR = 0.2;
+const SCALE_FACTOR = 0.25;
 
 function CurveEditor() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const curveEditorRef = useRef<CurveEditorClass | null>(null);
+  const segmentAmount = useConfigStore((state) => state.config.segmentAmount);
 
   // Utility function uses the ref directly
   const calculateSegmentSizes = (segmentAmount: number): number[] => {
@@ -25,7 +26,6 @@ function CurveEditor() {
     if (!canvas) return;
 
     const onPointsChange = () => {
-      const { segmentAmount } = useConfigStore.getState().config;
       const sizes = calculateSegmentSizes(segmentAmount);
       useConfigStore.getState().setConfig({ segmentSizes: sizes });
     };
@@ -37,6 +37,11 @@ function CurveEditor() {
       curveEditorRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    const sizes = calculateSegmentSizes(segmentAmount);
+    useConfigStore.getState().setConfig({ segmentSizes: sizes });
+  }, [segmentAmount]);
 
   return (
     <div className="p-0 border border-gray-300 w-fit ">
