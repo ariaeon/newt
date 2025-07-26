@@ -6,10 +6,11 @@ export class CurveEditorClass {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private points: Point[] = [
-    { x: 0, y: 175, id: 1 },
-    { x: 25, y: 175, id: 2 },
+    { x: 0, y: 195, id: 1 },
+    { x: 25, y: 195, id: 2 },
     { x: 35, y: 230, id: 3 },
-    { x: 300, y: 275, id: 4 },
+    { x: 250, y: 245, id: 4 },
+    { x: 300, y: 285, id: 5 },
   ];
   private dragId: number | null = null;
   private nextId: number = 3;
