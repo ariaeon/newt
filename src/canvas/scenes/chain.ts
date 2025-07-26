@@ -1,4 +1,4 @@
-import type { Segment, Point } from '@/types.ts';
+import type { Point } from '@/types.ts';
 import {
   drawCircle,
   drawBodyCurve,
@@ -12,19 +12,17 @@ import {
 } from './../helpers/math.util.ts';
 import { getConfig } from '@/store/utils';
 import type { ConfigState } from '@/store/index.ts';
-import { arraysEqual } from '@/util.ts';
 
-let segments: Segment[];
+let segments: Point[];
 
 function makeSegments(
   config: ConfigState,
-  prevSegments: Segment[] = []
-): Segment[] {
-  const { segmentAmount, segmentSizes } = config;
+  prevSegments: Point[] = []
+): Point[] {
+  const { segmentAmount } = config;
   return Array.from({ length: segmentAmount }, (_, i) => ({
     x: prevSegments[i]?.x || 0,
     y: prevSegments[i]?.y || 0,
-    size: segmentSizes[i] || segmentSizes[segmentSizes.length - 1],
   }));
 }
 
@@ -33,14 +31,7 @@ export function draw() {
   const leftAnchors: Point[] = [];
   const rightAnchors: Point[] = [];
 
-  if (
-    !segments ||
-    segments.length !== config.segmentAmount ||
-    !arraysEqual(
-      config.segmentSizes,
-      segments.map((s) => s.size)
-    )
-  ) {
+  if (!segments || segments.length !== config.segmentAmount) {
     segments = makeSegments(config, segments);
   }
   const { segmentDistance, strokeWidth, strokeColor, fillColor, fillBool } =
@@ -51,11 +42,15 @@ export function draw() {
     segments[1].y - segments[0].y,
     segments[1].x - segments[0].x
   );
-  const { left, right } = calculateSegmentAnchors(segments[0], headAngle);
+  const { left, right } = calculateSegmentAnchors(
+    segments[0],
+    config.segmentSizes[0],
+    headAngle
+  );
   leftAnchors.push(left);
   rightAnchors.push(right);
 
-  drawDebugSegment(segments[0], config);
+  drawDebugSegment(segments[0], config.segmentSizes[0], config);
   drawDebugAnchors(left, right, config);
 
   for (let i = 1; i < segments.length; i++) {
@@ -68,13 +63,17 @@ export function draw() {
       ...constrainDistance(segments[i], segments[i - 1], segmentDistance),
     };
 
-    const { left, right } = calculateSegmentAnchors(segments[i], angle);
+    const { left, right } = calculateSegmentAnchors(
+      segments[i],
+      config.segmentSizes[i],
+      angle
+    );
     leftAnchors.push(left);
     rightAnchors.push(right);
 
     drawDebugAnchors(left, right, config);
-    drawDebugSegment(segments[i], config);
-    drawDebugAngles(segments[i], angle, config);
+    drawDebugSegment(segments[i], config.segmentSizes[i], config);
+    drawDebugAngles(segments[i], config.segmentSizes[i], angle, config);
   }
 
   //DRAW BODY
@@ -103,21 +102,26 @@ function drawDebugAnchors(left: Point, right: Point, config: ConfigState) {
   }
 }
 
-function drawDebugSegment(segment: Segment, config: ConfigState) {
+function drawDebugSegment(segment: Point, size: number, config: ConfigState) {
   if (config.debug.drawSegments) {
     drawCircle({
       x: segment.x,
       y: segment.y,
-      radius: segment.size,
+      radius: size,
       strokeColor: '#FF0000',
       strokeWidth: 1,
     });
   }
 }
 
-function drawDebugAngles(segment: Segment, angle: number, config: ConfigState) {
+function drawDebugAngles(
+  segment: Point,
+  size: number,
+  angle: number,
+  config: ConfigState
+) {
   if (config.debug.drawAngles) {
-    visualiseAngle(segment, angle, segment.size, '#00FF00');
+    visualiseAngle(segment, angle, size, '#00FF00');
   }
 }
 

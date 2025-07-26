@@ -1,4 +1,4 @@
-import type { Point, Segment } from '@/types';
+import type { Point } from '@/types';
 
 export function constrainDistance(
   point: { x: number; y: number },
@@ -28,13 +28,14 @@ export const parametricCircle = (
 };
 
 export function calculateSegmentAnchors(
-  segment: Segment,
+  segment: Point,
+  size: number,
   angle: number
 ): { left: Point; right: Point } {
-  const rx = parametricCircle(segment, segment.size, angle - Math.PI / 2).x;
-  const ry = parametricCircle(segment, segment.size, angle - Math.PI / 2).y;
-  const lx = parametricCircle(segment, segment.size, angle + Math.PI / 2).x;
-  const ly = parametricCircle(segment, segment.size, angle + Math.PI / 2).y;
+  const rx = parametricCircle(segment, size, angle - Math.PI / 2).x;
+  const ry = parametricCircle(segment, size, angle - Math.PI / 2).y;
+  const lx = parametricCircle(segment, size, angle + Math.PI / 2).x;
+  const ly = parametricCircle(segment, size, angle + Math.PI / 2).y;
 
   const left = { x: lx, y: ly };
   const right = { x: rx, y: ry };
