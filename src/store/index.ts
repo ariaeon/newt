@@ -25,7 +25,7 @@ export const useConfigStore = create<ConfigStore>((set) => ({
   config: {
     segmentAmount: 15,
     segmentDistance: 25,
-    segmentSizes: [30, 40, 45, 50, 45, 40, 35, 30, 20, 15, 12.5, 10],
+    segmentSizes: [],
     strokeWidth: 2,
     strokeColor: '#00FFFF',
     fillBool: false,

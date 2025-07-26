@@ -31,7 +31,7 @@ function CurveEditor() {
     };
 
     curveEditorRef.current = new CurveEditorClass(canvas, onPointsChange);
-
+    onPointsChange(); // Initialize sizes
     return () => {
       curveEditorRef.current?.destroy();
       curveEditorRef.current = null;
