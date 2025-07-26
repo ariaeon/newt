@@ -26,6 +26,8 @@ function CurveEditor() {
     if (!canvas) return;
 
     const onPointsChange = () => {
+      // Keep, fixes stale value bug
+      const { segmentAmount } = useConfigStore.getState().config;
       const sizes = calculateSegmentSizes(segmentAmount);
       useConfigStore.getState().setConfig({ segmentSizes: sizes });
     };
