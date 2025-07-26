@@ -8,6 +8,7 @@ import { Checkbox } from './base/checkbox';
 import { useConfigStore } from '@/store';
 
 import { useState } from 'react';
+import CurveEditor from './CurveEditor';
 
 function updateConfig(data: Record<string, unknown>) {
   useConfigStore.getState().setConfig(data);
@@ -189,6 +190,7 @@ function ControlPanel() {
             )}
           </form>
         )}
+        <CurveEditor />
       </CardContent>
     </Card>
   );

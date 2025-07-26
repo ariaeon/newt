@@ -34,7 +34,7 @@ export const useConfigStore = create<ConfigStore>((set) => ({
       drawAnchors: true,
       drawSegments: true,
       drawAngles: true,
-      drawRigidBody: true,
+      drawRigidBody: false,
     },
   },
 
