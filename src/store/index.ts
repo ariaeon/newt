@@ -23,8 +23,8 @@ interface ConfigStore {
 
 export const useConfigStore = create<ConfigStore>((set) => ({
   config: {
-    segmentAmount: 15,
-    segmentDistance: 25,
+    segmentAmount: 20,
+    segmentDistance: 30,
     segmentSizes: [],
     strokeWidth: 2,
     strokeColor: '#00FFFF',

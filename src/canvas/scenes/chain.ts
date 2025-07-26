@@ -74,8 +74,21 @@ export function draw() {
     leftAnchors.push(left);
     rightAnchors.push(right);
 
+    // Tail anchors
+    if (i === segments.length - 1) {
+      const tailAnchors = getCustomAnchors(
+        segments[i],
+        config.segmentSizes[i],
+        angle,
+        [0]
+      );
+      leftAnchors.push(...tailAnchors.reverse());
+      drawDebugAnchors(tailAnchors[0], config);
+    }
+
     drawDebugAnchors(left, config);
     drawDebugAnchors(right, config);
+
     drawDebugSegment(segments[i], config.segmentSizes[i], config);
     drawDebugAngles(segments[i], config.segmentSizes[i], angle, config);
   }
