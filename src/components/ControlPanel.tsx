@@ -22,6 +22,8 @@ function ControlPanel() {
   const [showSegments, setShowSegments] = useState(true);
   const [showStyle, setShowStyle] = useState(true);
   const [showDebug, setShowDebug] = useState(true);
+  const [showSize, setShowSize] = useState(true);
+
   return (
     <Card
       className="absolute top-4 left-4 w-full max-w-sm max-h-[calc(100vh-2rem)] overflow-scroll"
@@ -88,6 +90,21 @@ function ControlPanel() {
                 </div>
               </div>
             )}
+            <div className="flex justify-between mt-8 mb-6">
+              <h3 className="font-semibold ">Size</h3>
+              <Button
+                variant="ghost"
+                size={'icon'}
+                onClick={() => setShowSize(!showSize)}
+                type="button"
+                aria-label={showSize ? 'Collapse Style' : 'Expand Style'}
+              >
+                {showSize ? <Minus /> : <Plus />}
+              </Button>
+            </div>
+            <div className={`flex flex-col gap-6 ${showSize ? '' : 'hidden'}`}>
+              <CurveEditor />
+            </div>
             <div className="flex justify-between mt-8 mb-6">
               <h3 className="font-semibold ">Style</h3>
               <Button
@@ -190,7 +207,6 @@ function ControlPanel() {
             )}
           </form>
         )}
-        <CurveEditor />
       </CardContent>
     </Card>
   );
