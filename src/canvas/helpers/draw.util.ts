@@ -203,7 +203,10 @@ interface BaseEyeOptions {
 
 type DrawEyesOptions =
   | (BaseEyeOptions & { hasPupils?: false })
-  | (BaseEyeOptions & { hasPupils: true; headAngle: number });
+  | (BaseEyeOptions & {
+      hasPupils: true;
+      headAngle: number;
+    });
 
 export const drawEyes = (options: DrawEyesOptions) => {
   const { anchors, radius = 10, fillColor = '#FFFFFF', hasPupils } = options;
@@ -217,13 +220,17 @@ export const drawEyes = (options: DrawEyesOptions) => {
   });
 
   if (hasPupils) {
-    const headAngle = options.headAngle;
+    const pupilAngle = options.headAngle + Math.PI;
+    const scaledTime = performance.now() * 0.005;
     anchors.forEach((anchor) => {
+      const angleOffset = Math.sin(scaledTime) / 2; // /2 to make it -0.5 to 0.5
+
       const { x, y } = parametricCircle(
         anchor,
         radius * 0.5,
-        headAngle + Math.PI
+        pupilAngle + angleOffset
       );
+
       drawCircle({
         x,
         y,
