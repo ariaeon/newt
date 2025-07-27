@@ -47,3 +47,10 @@ export const getPointOnSegment = ({
     segmentAngle + offsetAngle
   );
 };
+
+export const angleDifference = (a: number, b: number): number => {
+  let diff = a - b;
+  while (diff < -Math.PI) diff += Math.PI * 2;
+  while (diff > Math.PI) diff -= Math.PI * 2;
+  return diff;
+};

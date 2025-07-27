@@ -7,12 +7,13 @@ import {
   visualiseBodyRigid,
   drawEyes,
 } from './../helpers/draw.util';
-import { constrainDistance } from './../helpers/math.util.ts';
 import { getConfig } from '@/store/utils';
 import type { ConfigState } from '@/store/index.ts';
 import { getCustomAnchors, getSideAnchors } from '../helpers/anchors.util.ts';
+import { angleDifference, parametricCircle } from '../helpers/math.util.ts';
 
 let segments: Point[];
+const maxBend = Math.PI / 6; // 30 degrees, adjust as needed
 
 function makeSegments(
   config: ConfigState,
@@ -54,15 +55,26 @@ export function draw() {
     drawDebugAnchors(anchor, config);
   });
 
+  const angleMap = new Map<number, number>();
+
   for (let i = 1; i < segments.length; i++) {
     const dx = segments[i].x - segments[i - 1].x;
     const dy = segments[i].y - segments[i - 1].y;
-    const angle = Math.atan2(dy, dx); // radians
+    let angle = Math.atan2(dy, dx); // radians
 
-    segments[i] = {
-      ...segments[i],
-      ...constrainDistance(segments[i], segments[i - 1], segmentDistance),
-    };
+    if (angleMap.has(i - 1)) {
+      const prevAngle = angleMap.get(i - 1)!;
+      angle =
+        prevAngle +
+        Math.max(
+          -maxBend,
+          Math.min(maxBend, angleDifference(angle, prevAngle))
+        );
+    }
+    const { x, y } = parametricCircle(segments[i - 1], segmentDistance, angle);
+    segments[i] = { x, y };
+    angleMap.set(i, angle);
+    console.log(angleMap);
 
     // Use the generic one here maybe? less readable
     const { left, right } = getSideAnchors(
@@ -118,8 +130,9 @@ export function draw() {
 
 export function handleMouseMove(event: MouseEvent) {
   if (segments && segments[0]) {
-    segments[0].x = event.clientX;
-    segments[0].y = event.clientY;
+    const smoothing = 0.1;
+    segments[0].x += (event.clientX - segments[0].x) * smoothing;
+    segments[0].y += (event.clientY - segments[0].y) * smoothing;
   }
 }
 
