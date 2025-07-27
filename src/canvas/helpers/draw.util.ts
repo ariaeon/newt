@@ -132,11 +132,12 @@ export function drawBodyCurve({
   ctx.closePath();
   ctx.strokeStyle = strokeColor;
   ctx.lineWidth = strokeWidth;
+  ctx.stroke();
+
   if (fillColor) {
     ctx.fillStyle = fillColor;
     ctx.fill();
   }
-  ctx.stroke();
 }
 
 export const drawEyes = (
