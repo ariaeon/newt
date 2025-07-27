@@ -37,7 +37,7 @@ export function draw() {
   const { segmentDistance, strokeWidth, strokeColor, fillColor, fillBool } =
     config;
 
-  // Stuff for head, to revisit later
+  // This locks the head to the 2nd segment, intially thought it was a bug but it looks better for a snake
   const headAngle = Math.atan2(
     segments[1].y - segments[0].y,
     segments[1].x - segments[0].x
@@ -64,17 +64,13 @@ export function draw() {
 
     if (angleMap.has(i - 1)) {
       const prevAngle = angleMap.get(i - 1)!;
-      angle =
-        prevAngle +
-        Math.max(
-          -maxBend,
-          Math.min(maxBend, angleDifference(angle, prevAngle))
-        );
+      const angleDiff = angleDifference(angle, prevAngle);
+      angle = prevAngle + Math.max(-maxBend, Math.min(maxBend, angleDiff));
     }
+
     const { x, y } = parametricCircle(segments[i - 1], segmentDistance, angle);
     segments[i] = { x, y };
     angleMap.set(i, angle);
-    console.log(angleMap);
 
     // Use the generic one here maybe? less readable
     const { left, right } = getSideAnchors(
