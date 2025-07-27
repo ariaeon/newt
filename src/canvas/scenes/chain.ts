@@ -5,6 +5,7 @@ import {
   visualiseDot,
   visualiseAngle,
   visualiseBodyRigid,
+  drawEyes,
 } from './../helpers/draw.util';
 import { constrainDistance } from './../helpers/math.util.ts';
 import { getConfig } from '@/store/utils';
@@ -46,7 +47,6 @@ export function draw() {
     headAngle,
     [Math.PI / 2, Math.PI * 0.75, Math.PI, -Math.PI * 0.75, -Math.PI / 2]
   );
-
   leftAnchors.push(...headAnchors.reverse());
 
   drawDebugSegment(segments[0], config.segmentSizes[0], config);
@@ -103,6 +103,17 @@ export function draw() {
     fillColor: fillBool ? fillColor : undefined,
   });
   drawDebugBody([...leftAnchors, ...rightReversed], config);
+
+  // Eyes
+  const eyeAnchors = getCustomAnchors(
+    segments[0],
+    config.segmentSizes[0] * 0.9,
+    headAngle,
+    [Math.PI * 0.25, -Math.PI * 0.25]
+  );
+  drawEyes(eyeAnchors, 5, '#FFFFFF');
+  drawDebugAnchors(eyeAnchors[0], config);
+  drawDebugAnchors(eyeAnchors[1], config);
 }
 
 export function handleMouseMove(event: MouseEvent) {

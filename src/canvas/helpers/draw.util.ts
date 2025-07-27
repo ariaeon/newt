@@ -138,3 +138,19 @@ export function drawBodyCurve({
   }
   ctx.stroke();
 }
+
+export const drawEyes = (
+  anchors: Point[],
+  radius: number = 10,
+  fillColor: string = '#FFFFFF'
+) => {
+  if (anchors.length === 0) return;
+  anchors.forEach((anchor) => {
+    drawCircle({
+      x: anchor.x,
+      y: anchor.y,
+      radius,
+      fillColor,
+    });
+  });
+};
