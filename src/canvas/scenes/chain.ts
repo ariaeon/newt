@@ -6,6 +6,7 @@ import {
   visualiseAngle,
   visualiseBodyRigid,
   drawEyes,
+  drawTongue,
 } from './../helpers/draw.util';
 import { getConfig } from '@/store/utils';
 import type { ConfigState } from '@/store/index.ts';
@@ -13,7 +14,8 @@ import { getCustomAnchors, getSideAnchors } from '../helpers/anchors.util.ts';
 import { angleDifference, parametricCircle } from '../helpers/math.util.ts';
 
 let segments: Point[];
-const maxBend = Math.PI / 6; // 30 degrees, adjust as needed
+const MAX_BEND = Math.PI / 6; // 30 degrees, adjust as needed
+const TONGUE_LENGTH = 15;
 
 function makeSegments(
   config: ConfigState,
@@ -65,7 +67,7 @@ export function draw() {
     if (angleMap.has(i - 1)) {
       const prevAngle = angleMap.get(i - 1)!;
       const angleDiff = angleDifference(angle, prevAngle);
-      angle = prevAngle + Math.max(-maxBend, Math.min(maxBend, angleDiff));
+      angle = prevAngle + Math.max(-MAX_BEND, Math.min(MAX_BEND, angleDiff));
     }
 
     const { x, y } = parametricCircle(segments[i - 1], segmentDistance, angle);
@@ -101,7 +103,14 @@ export function draw() {
     drawDebugAngles(segments[i], config.segmentSizes[i], angle, config);
   }
 
-  //DRAW BODY
+  // Tongue
+  drawTongue({
+    anchor: headAnchors[2],
+    angle: headAngle + Math.PI,
+    length: TONGUE_LENGTH,
+  });
+
+  // Body
   const rightReversed = [...rightAnchors].reverse();
   drawBodyCurve({
     points: [...leftAnchors, ...rightReversed],
@@ -119,7 +128,13 @@ export function draw() {
     headAngle,
     [Math.PI * 0.25, -Math.PI * 0.25]
   );
-  drawEyes(eyeAnchors, 5, '#FFFFFF');
+  drawEyes({
+    anchors: eyeAnchors,
+    radius: 5,
+    fillColor: '#FFFFFF',
+    hasPupils: true,
+    headAngle,
+  });
   drawDebugAnchors(eyeAnchors[0], config);
   drawDebugAnchors(eyeAnchors[1], config);
 }

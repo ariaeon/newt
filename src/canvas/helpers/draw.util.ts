@@ -1,5 +1,6 @@
 import type { Point } from '@/types.ts';
 import { getCtx } from '../canvasContext.ts';
+import { parametricCircle } from './math.util.ts';
 
 // Visualse = debug, takes params
 // Draw = useful, takes options body
@@ -36,6 +37,60 @@ export function drawCircle({
     ctx.fill();
   }
   ctx.closePath();
+}
+
+interface DrawLineOptions {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  strokeColor?: string;
+  strokeWidth?: number;
+}
+
+export function drawLine({
+  x1,
+  y1,
+  x2,
+  y2,
+  strokeColor = '#000000',
+  strokeWidth = 1,
+}: DrawLineOptions) {
+  const ctx = getCtx();
+  if (!ctx) return;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = strokeWidth;
+  ctx.stroke();
+  ctx.closePath();
+}
+
+interface DrawLineFromAngleOptions {
+  anchor: { x: number; y: number };
+  angle: number;
+  length: number;
+  strokeColor?: string;
+  strokeWidth?: number;
+}
+
+export function drawLineFromAngle({
+  anchor,
+  angle,
+  length,
+  strokeColor = '#000000',
+  strokeWidth = 1,
+}: DrawLineFromAngleOptions) {
+  const { x, y } = parametricCircle(anchor, length, angle);
+  drawLine({
+    x1: anchor.x,
+    y1: anchor.y,
+    x2: x,
+    y2: y,
+    strokeColor,
+    strokeWidth,
+  });
 }
 
 export function visualiseAngle(
@@ -140,12 +195,18 @@ export function drawBodyCurve({
   }
 }
 
-export const drawEyes = (
-  anchors: Point[],
-  radius: number = 10,
-  fillColor: string = '#FFFFFF'
-) => {
-  if (anchors.length === 0) return;
+interface BaseEyeOptions {
+  anchors: Point[];
+  radius?: number;
+  fillColor?: string;
+}
+
+type DrawEyesOptions =
+  | (BaseEyeOptions & { hasPupils?: false })
+  | (BaseEyeOptions & { hasPupils: true; headAngle: number });
+
+export const drawEyes = (options: DrawEyesOptions) => {
+  const { anchors, radius = 10, fillColor = '#FFFFFF', hasPupils } = options;
   anchors.forEach((anchor) => {
     drawCircle({
       x: anchor.x,
@@ -154,4 +215,60 @@ export const drawEyes = (
       fillColor,
     });
   });
+
+  if (hasPupils) {
+    const headAngle = options.headAngle;
+    anchors.forEach((anchor) => {
+      const { x, y } = parametricCircle(
+        anchor,
+        radius * 0.5,
+        headAngle + Math.PI
+      );
+      drawCircle({
+        x,
+        y,
+        radius: radius * 0.5,
+        fillColor: '#000000',
+      });
+    });
+  }
+};
+
+interface DrawTongueOptions {
+  anchor: Point;
+  angle: number;
+  length?: number;
+  strokeColor?: string;
+  strokeWidth?: number;
+}
+
+export const drawTongue = ({
+  anchor,
+  length = 15,
+  angle,
+  strokeColor = '#FF0000',
+  strokeWidth = 2,
+}: DrawTongueOptions) => {
+  const ctx = getCtx();
+  if (!ctx) return;
+
+  drawLineFromAngle({
+    anchor,
+    angle,
+    length,
+    strokeColor,
+    strokeWidth,
+  });
+
+  const forkAngles = [Math.PI * 0.15, -Math.PI * 0.15];
+  const { x, y } = parametricCircle(anchor, length, angle);
+  for (const fork of forkAngles) {
+    drawLineFromAngle({
+      anchor: { x, y },
+      angle: angle + fork,
+      length: length * 0.5,
+      strokeColor,
+      strokeWidth,
+    });
+  }
 };

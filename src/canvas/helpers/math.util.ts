@@ -27,7 +27,7 @@ export const parametricCircle = (
   };
 };
 
-interface GetPointOnSegmentParams {
+interface GetPointOnSegmentOptions {
   segment: Point;
   distanceFromCenter: number;
   segmentAngle: number;
@@ -40,7 +40,7 @@ export const getPointOnSegment = ({
   distanceFromCenter,
   segmentAngle,
   offsetAngle,
-}: GetPointOnSegmentParams): Point => {
+}: GetPointOnSegmentOptions): Point => {
   return parametricCircle(
     segment,
     distanceFromCenter,
