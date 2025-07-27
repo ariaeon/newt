@@ -11,7 +11,6 @@ function CurveEditor() {
   const curveEditorRef = useRef<CurveEditorClass | null>(null);
   const segmentAmount = useConfigStore((state) => state.config.segmentAmount);
 
-  // Utility function uses the ref directly
   const calculateSegmentSizes = (segmentAmount: number): number[] => {
     const interval = CANVAS_WIDTH / (segmentAmount - 1);
     return Array.from({ length: segmentAmount }, (_, i) => {
@@ -25,6 +24,7 @@ function CurveEditor() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    // When curve changes
     const onPointsChange = () => {
       // Keep, fixes stale value bug
       const { segmentAmount } = useConfigStore.getState().config;
@@ -40,6 +40,7 @@ function CurveEditor() {
     };
   }, []);
 
+  // When config changes
   useEffect(() => {
     const sizes = calculateSegmentSizes(segmentAmount);
     useConfigStore.getState().setConfig({ segmentSizes: sizes });
