@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import './App.css';
 import { setup } from './canvas/setup.ts';
-import { draw } from './canvas/scenes/chain.ts';
+import { draw } from './canvas/draw.ts';
 import ControlPanel from './components/ControlPanel.tsx';
 
 function App() {

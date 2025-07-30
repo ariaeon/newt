@@ -15,7 +15,6 @@ function updateConfig(data: Record<string, unknown>) {
 }
 
 //TODO cool animation
-
 function ControlPanel() {
   const config = useConfigStore((state) => state.config);
   const [showConfig, setShowConfig] = useState(true);

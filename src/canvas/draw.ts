@@ -7,11 +7,11 @@ import {
   visualiseBodyRigid,
   drawEyes,
   drawTongue,
-} from './../helpers/draw.util';
+} from './helpers/draw.util';
 import { getConfig } from '@/store/utils';
-import type { ConfigState } from '@/store/index.ts';
-import { getCustomAnchors, getSideAnchors } from '../helpers/anchors.util.ts';
-import { angleDifference, parametricCircle } from '../helpers/math.util.ts';
+import type { ConfigState } from '@/types';
+import { getCustomAnchors, getSideAnchors } from './helpers/anchors.util.ts';
+import { angleDifference, parametricCircle } from './helpers/math.util.ts';
 
 let segments: Point[];
 const MAX_BEND = Math.PI / 6; // 30 degrees, adjust as needed

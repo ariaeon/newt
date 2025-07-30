@@ -1,20 +1,6 @@
+import { defaultConfig } from '@/consts/defaultConfig';
+import type { ConfigState } from '@/types';
 import { create } from 'zustand';
-
-export interface ConfigState {
-  segmentAmount: number;
-  segmentDistance: number;
-  segmentSizes: number[];
-  strokeWidth: number;
-  strokeColor: string;
-  fillBool: boolean;
-  fillColor: string;
-  debug: {
-    drawAnchors: boolean;
-    drawSegments: boolean;
-    drawAngles: boolean;
-    drawRigidBody: boolean;
-  };
-}
 
 interface ConfigStore {
   config: ConfigState;
@@ -22,21 +8,7 @@ interface ConfigStore {
 }
 
 export const useConfigStore = create<ConfigStore>((set) => ({
-  config: {
-    segmentAmount: 20,
-    segmentDistance: 30,
-    segmentSizes: [],
-    strokeWidth: 2,
-    strokeColor: '#00FF00',
-    fillBool: true,
-    fillColor: '#3f6e22',
-    debug: {
-      drawAnchors: false,
-      drawSegments: false,
-      drawAngles: false,
-      drawRigidBody: false,
-    },
-  },
+  config: defaultConfig,
 
   setConfig: (config) =>
     set((state) => ({
