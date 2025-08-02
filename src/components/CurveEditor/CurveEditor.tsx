@@ -9,7 +9,9 @@ const SCALE_FACTOR = 0.25;
 function CurveEditor() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const curveEditorRef = useRef<CurveEditorClass | null>(null);
-  const segmentAmount = useConfigStore((state) => state.config.segmentAmount);
+  const segmentAmount = useConfigStore(
+    (state) => state.config.shape.segmentAmount
+  );
 
   const calculateSegmentSizes = (segmentAmount: number): number[] => {
     const interval = CANVAS_WIDTH / (segmentAmount - 1);
@@ -20,6 +22,13 @@ function CurveEditor() {
     });
   };
 
+  const updateSegmentSizes = (sizes: number[]) => {
+    const prev = useConfigStore.getState().config;
+    useConfigStore
+      .getState()
+      .setConfig({ shape: { ...prev.shape, segmentSizes: sizes } });
+  };
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -27,9 +36,9 @@ function CurveEditor() {
     // When curve changes
     const onPointsChange = () => {
       // Keep, fixes stale value bug
-      const { segmentAmount } = useConfigStore.getState().config;
+      const { segmentAmount } = useConfigStore.getState().config.shape;
       const sizes = calculateSegmentSizes(segmentAmount);
-      useConfigStore.getState().setConfig({ segmentSizes: sizes });
+      updateSegmentSizes(sizes);
     };
 
     curveEditorRef.current = new CurveEditorClass(canvas, onPointsChange);
@@ -43,7 +52,7 @@ function CurveEditor() {
   // When config changes
   useEffect(() => {
     const sizes = calculateSegmentSizes(segmentAmount);
-    useConfigStore.getState().setConfig({ segmentSizes: sizes });
+    updateSegmentSizes(sizes);
   }, [segmentAmount]);
 
   return (

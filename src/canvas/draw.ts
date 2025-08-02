@@ -21,8 +21,7 @@ function makeSegments(
   config: ConfigState,
   prevSegments: Point[] = []
 ): Point[] {
-  const { segmentAmount } = config;
-  return Array.from({ length: segmentAmount }, (_, i) => ({
+  return Array.from({ length: config.shape.segmentAmount }, (_, i) => ({
     x: prevSegments[i]?.x || window.innerWidth / 2,
     y: prevSegments[i]?.y || window.innerHeight / 2,
   }));
@@ -32,12 +31,14 @@ export function draw() {
   const config = getConfig();
   const leftAnchors: Point[] = [];
   const rightAnchors: Point[] = [];
+  const { shape, style, parts } = config;
+  const { segmentAmount, segmentSizes, segmentDistance } = shape;
+  const { strokeColor, strokeWidth, fillBool, fillColor } = style;
+  const { eyes, tongue } = parts;
 
-  if (!segments || segments.length !== config.segmentAmount) {
+  if (!segments || segments.length !== segmentAmount) {
     segments = makeSegments(config, segments);
   }
-  const { segmentDistance, strokeWidth, strokeColor, fillColor, fillBool } =
-    config;
 
   // This locks the head to the 2nd segment, intially thought it was a bug but it looks better for a snake
   const headAngle = Math.atan2(
@@ -46,13 +47,13 @@ export function draw() {
   );
   const headAnchors = getCustomAnchors(
     segments[0],
-    config.segmentSizes[0],
+    segmentSizes[0],
     headAngle,
     [Math.PI / 2, Math.PI * 0.75, Math.PI, -Math.PI * 0.75, -Math.PI / 2]
   );
   leftAnchors.push(...headAnchors.reverse());
 
-  drawDebugSegment(segments[0], config.segmentSizes[0], config);
+  drawDebugSegment(segments[0], segmentSizes[0], config);
   headAnchors.forEach((anchor) => {
     drawDebugAnchors(anchor, config);
   });
@@ -75,11 +76,7 @@ export function draw() {
     angleMap.set(i, angle);
 
     // Use the generic one here maybe? less readable
-    const { left, right } = getSideAnchors(
-      segments[i],
-      config.segmentSizes[i],
-      angle
-    );
+    const { left, right } = getSideAnchors(segments[i], segmentSizes[i], angle);
 
     leftAnchors.push(left);
     rightAnchors.push(right);
@@ -88,7 +85,7 @@ export function draw() {
     if (i === segments.length - 1) {
       const tailAnchors = getCustomAnchors(
         segments[i],
-        config.segmentSizes[i],
+        segmentSizes[i],
         angle,
         [0]
       );
@@ -99,16 +96,18 @@ export function draw() {
     drawDebugAnchors(left, config);
     drawDebugAnchors(right, config);
 
-    drawDebugSegment(segments[i], config.segmentSizes[i], config);
-    drawDebugAngles(segments[i], config.segmentSizes[i], angle, config);
+    drawDebugSegment(segments[i], segmentSizes[i], config);
+    drawDebugAngles(segments[i], segmentSizes[i], angle, config);
   }
 
   // Tongue
-  drawTongue({
-    anchor: headAnchors[2],
-    angle: headAngle + Math.PI,
-    length: TONGUE_LENGTH,
-  });
+  if (tongue) {
+    drawTongue({
+      anchor: headAnchors[2],
+      angle: headAngle + Math.PI,
+      length: TONGUE_LENGTH,
+    });
+  }
 
   // Body
   const rightReversed = [...rightAnchors].reverse();
@@ -122,21 +121,23 @@ export function draw() {
   drawDebugBody([...leftAnchors, ...rightReversed], config);
 
   // Eyes
-  const eyeAnchors = getCustomAnchors(
-    segments[0],
-    config.segmentSizes[0] * 0.9,
-    headAngle,
-    [Math.PI * 0.25, -Math.PI * 0.25]
-  );
-  drawEyes({
-    anchors: eyeAnchors,
-    radius: 5,
-    fillColor: '#FFFFFF',
-    hasPupils: true,
-    headAngle,
-  });
-  drawDebugAnchors(eyeAnchors[0], config);
-  drawDebugAnchors(eyeAnchors[1], config);
+  if (eyes) {
+    const eyeAnchors = getCustomAnchors(
+      segments[0],
+      segmentSizes[0] * 0.9,
+      headAngle,
+      [Math.PI * 0.25, -Math.PI * 0.25]
+    );
+    drawEyes({
+      anchors: eyeAnchors,
+      radius: 5,
+      fillColor: '#FFFFFF',
+      hasPupils: true,
+      headAngle,
+    });
+    drawDebugAnchors(eyeAnchors[0], config);
+    drawDebugAnchors(eyeAnchors[1], config);
+  }
 }
 
 export function handleMouseMove(event: MouseEvent) {

@@ -4,13 +4,22 @@ export interface Point {
 }
 
 export interface ConfigState {
-  segmentAmount: number;
-  segmentDistance: number;
-  segmentSizes: number[];
-  strokeWidth: number;
-  strokeColor: string;
-  fillBool: boolean;
-  fillColor: string;
+  shape: {
+    segmentAmount: number;
+    segmentDistance: number;
+    segmentSizes: number[];
+  };
+  style: {
+    strokeWidth: number;
+    strokeColor: string;
+    fillBool: boolean;
+    fillColor: string;
+  };
+  parts: {
+    eyes: boolean;
+    tongue: boolean;
+    fins: boolean;
+  };
   debug: {
     drawAnchors: boolean;
     drawSegments: boolean;

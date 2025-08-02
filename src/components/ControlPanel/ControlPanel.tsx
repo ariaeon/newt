@@ -23,12 +23,14 @@ function ControlPanel() {
   const [showStyle, setShowStyle] = useState(true);
   const [showDebug, setShowDebug] = useState(true);
   const [showShape, setShowShape] = useState(true);
+  const [showParts, setShowParts] = useState(true);
   const {
     SEGMENT_AMOUNT_MIN,
     SEGMENT_AMOUNT_MAX,
     SEGMENT_DISTANCE_MIN,
     SEGMENT_DISTANCE_MAX,
   } = ConfigOptions;
+  const { shape, style, parts } = config;
 
   return (
     <Card
@@ -92,7 +94,7 @@ function ControlPanel() {
                 onValueChange={(value: number[]) =>
                   updateConfig({ segmentAmount: value[0] })
                 }
-                value={[config.segmentAmount]}
+                value={[shape.segmentAmount]}
               />
             </div>
             <div className="grid gap-4">
@@ -106,7 +108,7 @@ function ControlPanel() {
                 onValueChange={(value: number[]) =>
                   updateConfig({ segmentDistance: value[0] })
                 }
-                value={[config.segmentDistance]}
+                value={[shape.segmentDistance]}
               />
             </div>
             <div className="grid gap-4">
@@ -125,7 +127,7 @@ function ControlPanel() {
                   min={1}
                   max={10}
                   step={1}
-                  value={config.strokeWidth}
+                  value={style.strokeWidth}
                   onChange={(e) =>
                     updateConfig({ strokeWidth: Number(e.target.value) })
                   }
@@ -137,7 +139,7 @@ function ControlPanel() {
                   id="strokeColor"
                   type="color"
                   className="w-full"
-                  value={config.strokeColor}
+                  value={style.strokeColor}
                   onChange={(e) =>
                     updateConfig({ strokeColor: e.target.value })
                   }
@@ -149,7 +151,7 @@ function ControlPanel() {
                 <Label htmlFor="fillBool">Fill </Label>
                 <Checkbox
                   id="fillBool"
-                  checked={config.fillBool}
+                  checked={style.fillBool}
                   onCheckedChange={(checked) =>
                     updateConfig({ fillBool: !!checked })
                   }
@@ -161,9 +163,49 @@ function ControlPanel() {
                   id="fillColor"
                   type="color"
                   className="w-full"
-                  value={config.fillColor}
+                  value={style.fillColor}
                   onChange={(e) => updateConfig({ fillColor: e.target.value })}
                 />
+              </div>
+            </div>
+          </PanelSection>
+          <PanelSection label="Parts" show={showParts} setShow={setShowParts}>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="parts-eyes"
+                  checked={parts?.eyes}
+                  onCheckedChange={(checked) =>
+                    updateConfig({
+                      parts: { ...config.parts, eyes: !!checked },
+                    })
+                  }
+                />
+                <Label htmlFor="parts-eyes">Eyes</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="parts-tongue"
+                  checked={parts?.tongue}
+                  onCheckedChange={(checked) =>
+                    updateConfig({
+                      parts: { ...config.parts, tongue: !!checked },
+                    })
+                  }
+                />
+                <Label htmlFor="parts-tongue">Tongue</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="parts-fins"
+                  checked={parts?.fins}
+                  onCheckedChange={(checked) =>
+                    updateConfig({
+                      parts: { ...config.parts, fins: !!checked },
+                    })
+                  }
+                />
+                <Label htmlFor="parts-fins">Fins</Label>
               </div>
             </div>
           </PanelSection>
