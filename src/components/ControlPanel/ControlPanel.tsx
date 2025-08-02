@@ -19,7 +19,7 @@ function updateConfig(data: Record<string, unknown>) {
 //TODO cool animation
 function ControlPanel() {
   const config = useConfigStore((state) => state.config);
-  const [configOpen, setConfigOpen] = useState(true);
+  const [configOpen, setConfigOpen] = useState(false);
   const [showStyle, setShowStyle] = useState(true);
   const [showDebug, setShowDebug] = useState(true);
   const [showShape, setShowShape] = useState(true);

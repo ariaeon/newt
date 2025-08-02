@@ -23,8 +23,8 @@ function makeSegments(
 ): Point[] {
   const { segmentAmount } = config;
   return Array.from({ length: segmentAmount }, (_, i) => ({
-    x: prevSegments[i]?.x || 0,
-    y: prevSegments[i]?.y || 0,
+    x: prevSegments[i]?.x || window.innerWidth / 2,
+    y: prevSegments[i]?.y || window.innerHeight / 2,
   }));
 }
 
