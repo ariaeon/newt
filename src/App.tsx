@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import './App.css';
 import { setup } from './canvas/setup.ts';
 import { draw } from './canvas/draw.ts';
-import ControlPanel from './components/ControlPanel.tsx';
+import ControlPanel from './components/ControlPanel/ControlPanel.tsx';
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);

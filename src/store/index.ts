@@ -1,4 +1,4 @@
-import { defaultConfig } from '@/consts/defaultConfig';
+import { defaultConfig } from '@/consts/config.consts.ts';
 import type { ConfigState } from '@/types';
 import { create } from 'zustand';
 

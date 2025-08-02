@@ -15,3 +15,11 @@ export const defaultConfig: ConfigState = {
     drawRigidBody: false,
   },
 };
+
+export const ConfigOptions = {
+  SEGMENT_AMOUNT_MIN: 5,
+  SEGMENT_AMOUNT_MAX: 50,
+  SEGMENT_DISTANCE_MIN: 10,
+  SEGMENT_DISTANCE_MAX: 50,
+  SEGMENT_MAX_WIDTH: 'SEGMENT_MAX_WIDTH',
+};

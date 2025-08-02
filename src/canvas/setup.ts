@@ -1,6 +1,6 @@
 import { setCanvas, setCtx } from './canvasContext';
 import { drawFrameWrapper } from './drawFrameWrapper';
-import { handleMouseMove } from './scenes/chain';
+import { handleMouseMove } from './draw';
 
 export function setup(drawfn: () => void) {
   const canvas: HTMLCanvasElement = document.getElementById(
