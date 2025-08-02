@@ -37,12 +37,12 @@ function ControlPanel() {
       }`}
       onMouseDown={(e) => e.stopPropagation()}
     >
-      <CardTitle className={configOpen ? 'px-6' : 'p-0 '}>
+      <CardTitle className={configOpen ? 'px-6' : 'p-0'}>
         <div className="flex">
           <div
-            className={
-              configOpen ? 'opacity-0 max-w-0' : 'opacity-100 max-w-10'
-            }
+            className={`transition-opacity duration-300 ${
+              configOpen ? 'opacity-0 max-w-0 max-h-0' : 'opacity-100 max-w-10'
+            }`}
           >
             <Button
               variant="ghost"
@@ -50,7 +50,6 @@ function ControlPanel() {
               onClick={() => setConfigOpen(!configOpen)}
               type="button"
               aria-label={configOpen ? 'Close config' : 'Open config'}
-              className={configOpen ? 'opacity-0' : 'opacity-100'}
             >
               <SlidersHorizontal />
             </Button>
@@ -58,16 +57,15 @@ function ControlPanel() {
           <div
             className={`flex grow justify-between ${
               configOpen ? 'opacity-100 max-w-sm' : 'opacity-0 max-w-0 max-h-0'
-            }`}
+            } `}
           >
-            <h2 className={'text-2xl whitespace-nowrap'}>Control panel</h2>
+            <h2 className="text-2xl whitespace-nowrap">Control panel</h2>
             <Button
               variant="ghost"
               size={'icon'}
               onClick={() => setConfigOpen(!configOpen)}
               type="button"
               aria-label={configOpen ? 'Close config' : 'Open config'}
-              className={configOpen ? 'opacity-100' : 'opacity-0'}
             >
               <X />
             </Button>
@@ -77,7 +75,7 @@ function ControlPanel() {
       <CardContent
         className="overflow-scroll transition-all duration-300 ease-in-out"
         style={{
-          maxHeight: configOpen ? '1000px' : '0px',
+          maxHeight: configOpen ? '800px' : '0px',
           opacity: configOpen ? 1 : 0,
         }}
       >
