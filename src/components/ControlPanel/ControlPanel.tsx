@@ -12,18 +12,18 @@ import { useState } from 'react';
 import CurveEditor from '../CurveEditor/CurveEditor';
 import PanelSection from './PanelSection';
 
-function updateConfig(data: Record<string, unknown>) {
-  useConfigStore.getState().setConfig(data);
-}
-
-//TODO cool animation
 function ControlPanel() {
   const config = useConfigStore((state) => state.config);
-  const [configOpen, setConfigOpen] = useState(false);
+  const setShape = useConfigStore((state) => state.setShape);
+  const setStyle = useConfigStore((state) => state.setStyle);
+  const setParts = useConfigStore((state) => state.setParts);
+  const setDebug = useConfigStore((state) => state.setDebug);
+  const [configOpen, setConfigOpen] = useState(true);
   const [showStyle, setShowStyle] = useState(true);
   const [showDebug, setShowDebug] = useState(true);
   const [showShape, setShowShape] = useState(true);
   const [showParts, setShowParts] = useState(true);
+  const [showEyes, setShowEyes] = useState(true);
   const {
     SEGMENT_AMOUNT_MIN,
     SEGMENT_AMOUNT_MAX,
@@ -92,7 +92,7 @@ function ControlPanel() {
                 step={1}
                 className="w-full"
                 onValueChange={(value: number[]) =>
-                  updateConfig({ segmentAmount: value[0] })
+                  setShape({ segmentAmount: value[0] })
                 }
                 value={[shape.segmentAmount]}
               />
@@ -106,7 +106,7 @@ function ControlPanel() {
                 step={1}
                 className="w-full"
                 onValueChange={(value: number[]) =>
-                  updateConfig({ segmentDistance: value[0] })
+                  setShape({ segmentDistance: value[0] })
                 }
                 value={[shape.segmentDistance]}
               />
@@ -129,7 +129,7 @@ function ControlPanel() {
                   step={1}
                   value={style.strokeWidth}
                   onChange={(e) =>
-                    updateConfig({ strokeWidth: Number(e.target.value) })
+                    setStyle({ strokeWidth: Number(e.target.value) })
                   }
                 />
               </div>
@@ -140,9 +140,7 @@ function ControlPanel() {
                   type="color"
                   className="w-full"
                   value={style.strokeColor}
-                  onChange={(e) =>
-                    updateConfig({ strokeColor: e.target.value })
-                  }
+                  onChange={(e) => setStyle({ strokeColor: e.target.value })}
                 />
               </div>
             </div>
@@ -153,7 +151,7 @@ function ControlPanel() {
                   id="fillBool"
                   checked={style.fillBool}
                   onCheckedChange={(checked) =>
-                    updateConfig({ fillBool: !!checked })
+                    setStyle({ fillBool: !!checked })
                   }
                 />
               </div>
@@ -164,34 +162,134 @@ function ControlPanel() {
                   type="color"
                   className="w-full"
                   value={style.fillColor}
-                  onChange={(e) => updateConfig({ fillColor: e.target.value })}
+                  onChange={(e) => setStyle({ fillColor: e.target.value })}
                 />
               </div>
             </div>
           </PanelSection>
           <PanelSection label="Parts" show={showParts} setShow={setShowParts}>
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="parts-eyes"
-                  checked={parts?.eyes}
-                  onCheckedChange={(checked) =>
-                    updateConfig({
-                      parts: { ...config.parts, eyes: !!checked },
-                    })
-                  }
-                />
-                <Label htmlFor="parts-eyes">Eyes</Label>
-              </div>
+            <div className="flex flex-col gap-8">
+              <PanelSection
+                label="Eyes"
+                show={showEyes}
+                setShow={setShowEyes}
+                isSubsection
+              >
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="parts-eyes-enabled"
+                    checked={parts.eyes.enabled}
+                    onCheckedChange={(checked) =>
+                      setParts({ eyes: { ...parts.eyes, enabled: !!checked } })
+                    }
+                  />
+                  <Label htmlFor="parts-eyes-enabled">Eyes enabled</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="parts-eyes-hasPupils"
+                    checked={parts.eyes.hasPupils}
+                    onCheckedChange={(checked) =>
+                      setParts({
+                        eyes: { ...parts.eyes, hasPupils: !!checked },
+                      })
+                    }
+                  />
+                  <Label htmlFor="parts-eyes-hasPupils">Has pupils</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="parts-eyes-size">Size</Label>
+                  <Input
+                    id="parts-eyes-size"
+                    type="number"
+                    min={1}
+                    max={50}
+                    step={1}
+                    className="w-20"
+                    value={parts.eyes.size}
+                    onChange={(e) =>
+                      setParts({
+                        eyes: { ...parts.eyes, size: Number(e.target.value) },
+                      })
+                    }
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="parts-eyes-segmentIndex">Segment index</Label>
+                  <Input
+                    id="parts-eyes-segmentIndex"
+                    type="number"
+                    min={0}
+                    max={shape.segmentAmount - 1}
+                    step={1}
+                    className="w-20"
+                    value={parts.eyes.segmentIndex}
+                    onChange={(e) =>
+                      setParts({
+                        eyes: {
+                          ...parts.eyes,
+                          segmentIndex: Number(e.target.value),
+                        },
+                      })
+                    }
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="parts-eyes-segmentOffset">
+                    Segment offset
+                  </Label>
+                  <Input
+                    id="parts-eyes-segmentOffset"
+                    type="number"
+                    min={0}
+                    max={2}
+                    step={0.1}
+                    className="w-24"
+                    value={parts.eyes.segmentOffset}
+                    onChange={(e) =>
+                      setParts({
+                        eyes: {
+                          ...parts.eyes,
+                          segmentOffset: Number(e.target.value),
+                        },
+                      })
+                    }
+                  />
+                </div>
+                <div className="flex items-center gap-2 w-full">
+                  <Label htmlFor="parts-eyes-angle">Angle</Label>
+                  <Slider
+                    id="parts-eyes-angle"
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    className="w-full"
+                    value={[parts.eyes.angle]}
+                    onValueChange={(value: number[]) =>
+                      setParts({ eyes: { ...parts.eyes, angle: value[0] } })
+                    }
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="parts-eyes-color">Color</Label>
+                  <Input
+                    id="parts-eyes-color"
+                    type="color"
+                    className="w-10 h-8 p-0 border-none bg-transparent"
+                    value={parts.eyes.color}
+                    onChange={(e) =>
+                      setParts({
+                        eyes: { ...parts.eyes, color: e.target.value },
+                      })
+                    }
+                  />
+                </div>
+              </PanelSection>
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="parts-tongue"
                   checked={parts?.tongue}
-                  onCheckedChange={(checked) =>
-                    updateConfig({
-                      parts: { ...config.parts, tongue: !!checked },
-                    })
-                  }
+                  onCheckedChange={(checked) => setParts({ tongue: !!checked })}
                 />
                 <Label htmlFor="parts-tongue">Tongue</Label>
               </div>
@@ -199,11 +297,7 @@ function ControlPanel() {
                 <Checkbox
                   id="parts-fins"
                   checked={parts?.fins}
-                  onCheckedChange={(checked) =>
-                    updateConfig({
-                      parts: { ...config.parts, fins: !!checked },
-                    })
-                  }
+                  onCheckedChange={(checked) => setParts({ fins: !!checked })}
                 />
                 <Label htmlFor="parts-fins">Fins</Label>
               </div>
@@ -218,9 +312,7 @@ function ControlPanel() {
                       id={`debug-${key}`}
                       checked={!!value}
                       onCheckedChange={(checked) =>
-                        updateConfig({
-                          debug: { ...config.debug, [key]: !!checked },
-                        })
+                        setDebug({ [key]: !!checked })
                       }
                     />
                     <Label htmlFor={`debug-${key}`}>{key}</Label>

@@ -121,19 +121,26 @@ export function draw() {
   drawDebugBody([...leftAnchors, ...rightReversed], config);
 
   // Eyes
-  if (eyes) {
+  if (eyes && eyes.enabled) {
+    const {
+      segmentIndex: i,
+      segmentOffset: offset,
+      angle,
+      size,
+      hasPupils,
+    } = eyes;
     const eyeAnchors = getCustomAnchors(
-      segments[0],
-      segmentSizes[0] * 0.9,
-      headAngle,
-      [Math.PI * 0.25, -Math.PI * 0.25]
+      segments[i],
+      segmentSizes[i] * offset,
+      i === 0 ? headAngle : angleMap.get(i) || 0,
+      [Math.PI * angle, -Math.PI * angle]
     );
     drawEyes({
       anchors: eyeAnchors,
-      radius: 5,
+      radius: size,
       fillColor: '#FFFFFF',
-      hasPupils: true,
-      headAngle,
+      hasPupils: hasPupils,
+      headAngle: i === 0 ? headAngle : angleMap.get(i) || 0,
     });
     drawDebugAnchors(eyeAnchors[0], config);
     drawDebugAnchors(eyeAnchors[1], config);

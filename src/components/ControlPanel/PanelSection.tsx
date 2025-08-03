@@ -7,13 +7,26 @@ interface PanelSectionProps {
   show: boolean;
   setShow: Dispatch<SetStateAction<boolean>>;
   children: ReactNode;
+  isSubsection?: boolean;
 }
 
-function PanelSection({ label, show, setShow, children }: PanelSectionProps) {
+function PanelSection({
+  label,
+  show,
+  setShow,
+  children,
+  isSubsection,
+}: PanelSectionProps) {
   return (
-    <div className="mb-6">
-      <div className="flex justify-between items-center mt-8 mb-2">
-        <h3 className="font-semibold text-xl">{label}</h3>
+    <div>
+      <div
+        className={`flex justify-between items-center mb-2 ${
+          !isSubsection ? 'mt-8' : ''
+        }`}
+      >
+        <h3 className={`font-semibold mb-4 ${!isSubsection ? 'text-xl' : ''}`}>
+          {label}
+        </h3>
         <Button
           variant="ghost"
           size={'icon'}
@@ -24,7 +37,7 @@ function PanelSection({ label, show, setShow, children }: PanelSectionProps) {
           {show ? <Minus /> : <Plus />}
         </Button>
       </div>
-      {show && <div className="flex flex-col gap-6">{children}</div>}
+      {show && <div className="flex flex-col gap-4 ml-4">{children}</div>}
     </div>
   );
 }

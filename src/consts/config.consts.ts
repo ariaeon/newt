@@ -13,7 +13,15 @@ export const defaultConfig: ConfigState = {
     fillColor: '#3f6e22',
   },
   parts: {
-    eyes: true,
+    eyes: {
+      enabled: true,
+      hasPupils: true,
+      size: 5,
+      segmentIndex: 0,
+      segmentOffset: 0.9,
+      angle: 0.25, // 90 degrees
+      color: '#FFFFFF',
+    },
     tongue: true,
     fins: true,
   },

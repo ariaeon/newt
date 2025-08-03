@@ -3,6 +3,16 @@ export interface Point {
   y: number;
 }
 
+export interface EyeConfig {
+  enabled: boolean;
+  hasPupils: boolean;
+  size: number;
+  segmentIndex: number;
+  segmentOffset: number;
+  angle: number;
+  color: string;
+}
+
 export interface ConfigState {
   shape: {
     segmentAmount: number;
@@ -16,7 +26,7 @@ export interface ConfigState {
     fillColor: string;
   };
   parts: {
-    eyes: boolean;
+    eyes: EyeConfig;
     tongue: boolean;
     fins: boolean;
   };
