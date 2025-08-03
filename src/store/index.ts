@@ -1,4 +1,4 @@
-import { defaultConfig } from '@/consts/config.consts.ts';
+import { snakeConfig } from '@/consts/config.consts.ts';
 import type { ConfigState } from '@/types';
 import { create } from 'zustand';
 
@@ -12,7 +12,7 @@ interface ConfigStore {
 }
 
 export const useConfigStore = create<ConfigStore>((set) => ({
-  config: defaultConfig,
+  config: snakeConfig,
 
   setConfig: (config) =>
     set((state) => ({

@@ -11,6 +11,7 @@ import { useConfigStore } from '@/store';
 import { useState } from 'react';
 import CurveEditor from '../CurveEditor/CurveEditor';
 import PanelSection from './PanelSection';
+import { presets } from '@/consts/config.consts';
 
 const initialPanelState = {
   style: true,
@@ -94,6 +95,28 @@ function ControlPanel() {
           opacity: configOpen ? 1 : 0,
         }}
       >
+        <div className="mb-4 flex gap-2 items-center">
+          <label htmlFor="preset-select" className="text-sm font-medium">
+            Preset:
+          </label>
+          <select
+            id="preset-select"
+            className="border rounded px-2 py-1 text-sm"
+            onChange={(e) => {
+              const preset = presets[e.target.value as keyof typeof presets];
+              if (preset) {
+                useConfigStore.getState().setConfig(preset);
+              }
+            }}
+            defaultValue={Object.keys(presets)[0]}
+          >
+            {Object.keys(presets).map((preset) => (
+              <option key={preset} value={preset}>
+                {preset}
+              </option>
+            ))}
+          </select>
+        </div>
         <form>
           <PanelSection
             label="Shape"
