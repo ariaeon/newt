@@ -1,6 +1,7 @@
 import type { Point } from '@/types.ts';
 import { getCtx } from '../canvasContext.ts';
 import { parametricCircle } from './math.util.ts';
+import type { Segment } from '../draw.ts';
 
 // Visualse = debug, takes params
 // Draw = useful, takes options body
@@ -27,6 +28,47 @@ export function drawCircle({
   if (!ctx) return;
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2, false);
+  if (strokeColor) {
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = strokeWidth;
+    ctx.stroke();
+  }
+  if (fillColor) {
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+  }
+  ctx.closePath();
+}
+
+interface DrawEllipseOptions {
+  x: number;
+  y: number;
+  radiusX: number;
+  radiusY: number;
+  rotation?: number;
+  startAngle?: number;
+  endAngle?: number;
+  strokeColor?: string;
+  strokeWidth?: number;
+  fillColor?: string;
+}
+
+export function drawEllipse({
+  x,
+  y,
+  radiusX,
+  radiusY,
+  rotation = 0,
+  startAngle = 0,
+  endAngle = Math.PI * 2,
+  strokeColor = '#FF0000',
+  strokeWidth = 1,
+  fillColor,
+}: DrawEllipseOptions) {
+  const ctx = getCtx();
+  if (!ctx) return;
+  ctx.beginPath();
+  ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle);
   if (strokeColor) {
     ctx.strokeStyle = strokeColor;
     ctx.lineWidth = strokeWidth;
@@ -278,4 +320,49 @@ export const drawTongue = ({
       strokeWidth,
     });
   }
+};
+
+interface DrawFinsOptions {
+  segment: Segment;
+  fillColor?: string;
+  strokeColor?: string;
+  strokeWidth?: number;
+  radiusX?: number;
+  radiusY?: number;
+  offsetAngle?: number;
+}
+
+export const drawFins = ({
+  segment,
+  fillColor = '#FF0000',
+  strokeColor = '#FF0000',
+  strokeWidth = 2,
+  radiusX = 50,
+  radiusY = 20,
+  offsetAngle = 0.2,
+}: DrawFinsOptions) => {
+  const ctx = getCtx();
+  if (!ctx) return;
+
+  const { left, right } = segment.sideAnchors!;
+
+  drawEllipse({
+    ...left,
+    radiusX,
+    radiusY,
+    strokeColor,
+    strokeWidth,
+    rotation: segment.angle + offsetAngle,
+    fillColor,
+  });
+
+  drawEllipse({
+    ...right,
+    radiusX,
+    radiusY,
+    strokeColor,
+    strokeWidth,
+    rotation: segment.angle - offsetAngle,
+    fillColor,
+  });
 };

@@ -7,16 +7,17 @@ import {
   visualiseBodyRigid,
   drawEyes,
   drawTongue,
+  drawFins,
 } from './helpers/draw.util';
 import { getConfig } from '@/store/utils';
 import type { ConfigState } from '@/types';
 import { getCustomAnchors, getSideAnchors } from './helpers/anchors.util.ts';
 import { angleDifference, parametricCircle } from './helpers/math.util.ts';
 
-interface Segment extends Point {
+export interface Segment extends Point {
   angle: number;
   customAnchors?: Point[];
-  sideAnchors?: {
+  sideAnchors: {
     left: Point;
     right: Point;
   };
@@ -34,6 +35,10 @@ function makeSegments(
     x: prevSegments[i]?.x || window.innerWidth / 2,
     y: prevSegments[i]?.y || window.innerHeight / 2,
     angle: prevSegments[i]?.angle || 0,
+    sideAnchors: {
+      left: { x: 0, y: 0 },
+      right: { x: 0, y: 0 },
+    },
   }));
 }
 
@@ -42,7 +47,7 @@ export function draw() {
   const { shape, style, parts } = config;
   const { segmentAmount, segmentSizes, segmentDistance } = shape;
   const { strokeColor, strokeWidth, fillBool, fillColor } = style;
-  const { eyes, tongue } = parts;
+  const { eyes, tongue, fins } = parts;
 
   if (!segments || segments.length !== segmentAmount) {
     segments = makeSegments(config, segments);
@@ -53,11 +58,17 @@ export function draw() {
     segments[1].y - segments[0].y,
     segments[1].x - segments[0].x
   );
+  // Head anchor calculations
   segments[0].customAnchors = getCustomAnchors(
     segments[0],
     segmentSizes[0],
     segments[0].angle,
-    [Math.PI / 2, Math.PI * 0.75, Math.PI, -Math.PI * 0.75, -Math.PI / 2]
+    [Math.PI * 0.75, Math.PI, -Math.PI * 0.75]
+  );
+  segments[0].sideAnchors = getSideAnchors(
+    segments[0],
+    segmentSizes[0],
+    segments[0].angle
   );
 
   drawDebugSegment(segments[0], segmentSizes[0], config);
@@ -77,7 +88,6 @@ export function draw() {
     const { x, y } = parametricCircle(segments[i - 1], segmentDistance, angle);
     segments[i] = { ...segments[i], x, y, angle };
 
-    // Use the generic one here maybe? less readable
     segments[i].sideAnchors = getSideAnchors(
       segments[i],
       segmentSizes[i],
@@ -103,10 +113,23 @@ export function draw() {
     drawDebugAngles(segments[i], segmentSizes[i], angle, config);
   }
 
+  // Fins
+  if (fins) {
+    drawFins({
+      segment: segments[4],
+      fillColor: fillColor,
+      strokeColor: strokeColor,
+      strokeWidth: strokeWidth,
+      radiusX: 50,
+      radiusY: 20,
+      offsetAngle: 0.8,
+    });
+  }
+
   // Tongue
   if (tongue) {
     drawTongue({
-      anchor: segments[0].customAnchors[2],
+      anchor: segments[0].customAnchors[1],
       angle: segments[0].angle + Math.PI,
       length: TONGUE_LENGTH,
     });
@@ -115,10 +138,10 @@ export function draw() {
   // Body
   const points: Point[] = [
     ...segments[0].customAnchors.reverse(),
-    ...segments.slice(1).map((seg) => seg.sideAnchors!.left),
+    ...segments.map((seg) => seg.sideAnchors!.left),
     ...(segments[segments.length - 1].customAnchors || []),
     ...segments
-      .slice(1)
+      .slice()
       .reverse()
       .map((seg) => seg.sideAnchors!.right),
   ];
