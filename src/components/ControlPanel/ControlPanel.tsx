@@ -12,6 +12,16 @@ import { useState } from 'react';
 import CurveEditor from '../CurveEditor/CurveEditor';
 import PanelSection from './PanelSection';
 
+const initialPanelState = {
+  style: true,
+  shape: true,
+  parts: true,
+  eyes: false,
+  tongue: false,
+  fins: false,
+  debug: false,
+};
+
 function ControlPanel() {
   const config = useConfigStore((state) => state.config);
   const setShape = useConfigStore((state) => state.setShape);
@@ -19,11 +29,7 @@ function ControlPanel() {
   const setParts = useConfigStore((state) => state.setParts);
   const setDebug = useConfigStore((state) => state.setDebug);
   const [configOpen, setConfigOpen] = useState(true);
-  const [showStyle, setShowStyle] = useState(true);
-  const [showDebug, setShowDebug] = useState(true);
-  const [showShape, setShowShape] = useState(true);
-  const [showParts, setShowParts] = useState(true);
-  const [showEyes, setShowEyes] = useState(true);
+  const [showPanels, setShowPanels] = useState(initialPanelState);
   const {
     SEGMENT_AMOUNT_MIN,
     SEGMENT_AMOUNT_MAX,
@@ -31,6 +37,13 @@ function ControlPanel() {
     SEGMENT_DISTANCE_MAX,
   } = ConfigOptions;
   const { shape, style, parts } = config;
+
+  const togglePane = (panel: string) => {
+    setShowPanels((prev) => ({
+      ...prev,
+      [panel]: !prev[panel as keyof typeof initialPanelState],
+    }));
+  };
 
   return (
     <Card
@@ -82,43 +95,53 @@ function ControlPanel() {
         }}
       >
         <form>
-          <PanelSection label="Shape" show={showShape} setShow={setShowShape}>
-            <div className="grid gap-4">
-              <Label htmlFor="segmentLength">Amount of segments</Label>
-              <Slider
-                id="segmentLength"
-                min={SEGMENT_AMOUNT_MIN}
-                max={SEGMENT_AMOUNT_MAX}
-                step={1}
-                className="w-full"
-                onValueChange={(value: number[]) =>
-                  setShape({ segmentAmount: value[0] })
-                }
-                value={[shape.segmentAmount]}
-              />
-            </div>
-            <div className="grid gap-4">
-              <Label htmlFor="segmentDistance">Segment distance</Label>
-              <Slider
-                id="segmentDistance"
-                min={SEGMENT_DISTANCE_MIN}
-                max={SEGMENT_DISTANCE_MAX}
-                step={1}
-                className="w-full"
-                onValueChange={(value: number[]) =>
-                  setShape({ segmentDistance: value[0] })
-                }
-                value={[shape.segmentDistance]}
-              />
-            </div>
-            <div className="grid gap-4">
-              <Label>Width</Label>
-              <CurveEditor />
+          <PanelSection
+            label="Shape"
+            show={showPanels.shape}
+            setShow={() => togglePane('shape')}
+          >
+            <div className="grid grid-cols-2 gap-6">
+              <div className="grid gap-4 col-span-2">
+                <Label htmlFor="segmentLength">Amount of segments</Label>
+                <Slider
+                  id="segmentLength"
+                  min={SEGMENT_AMOUNT_MIN}
+                  max={SEGMENT_AMOUNT_MAX}
+                  step={1}
+                  className="w-full"
+                  onValueChange={(value: number[]) =>
+                    setShape({ segmentAmount: value[0] })
+                  }
+                  value={[shape.segmentAmount]}
+                />
+              </div>
+              <div className="grid gap-4 col-span-2">
+                <Label htmlFor="segmentDistance">Segment distance</Label>
+                <Slider
+                  id="segmentDistance"
+                  min={SEGMENT_DISTANCE_MIN}
+                  max={SEGMENT_DISTANCE_MAX}
+                  step={1}
+                  className="w-full"
+                  onValueChange={(value: number[]) =>
+                    setShape({ segmentDistance: value[0] })
+                  }
+                  value={[shape.segmentDistance]}
+                />
+              </div>
+              <div className="col-span-2 grid gap-4">
+                <Label>Width</Label>
+                <CurveEditor />
+              </div>
             </div>
           </PanelSection>
-          <PanelSection label="Style" show={showStyle} setShow={setShowStyle}>
-            <div className="flex gap-6">
-              <div className="grid gap-4 w-1/2">
+          <PanelSection
+            label="Style"
+            show={showPanels.style}
+            setShow={() => togglePane('style')}
+          >
+            <div className="grid grid-cols-2 gap-6">
+              <div className="grid gap-4">
                 <Label htmlFor="strokeWidth">Stroke width</Label>
                 <Input
                   id="strokeWidth"
@@ -133,7 +156,7 @@ function ControlPanel() {
                   }
                 />
               </div>
-              <div className="grid gap-4 w-1/2">
+              <div className="grid gap-4">
                 <Label htmlFor="strokeColor">Stroke color</Label>
                 <Input
                   id="strokeColor"
@@ -143,9 +166,7 @@ function ControlPanel() {
                   onChange={(e) => setStyle({ strokeColor: e.target.value })}
                 />
               </div>
-            </div>
-            <div className="flex gap-6">
-              <div className="grid gap-4 w-1/2">
+              <div className="grid gap-4">
                 <Label htmlFor="fillBool">Fill </Label>
                 <Checkbox
                   id="fillBool"
@@ -155,7 +176,7 @@ function ControlPanel() {
                   }
                 />
               </div>
-              <div className="grid gap-4 w-1/2">
+              <div className="grid gap-4">
                 <Label htmlFor="fillColor">Fill color</Label>
                 <Input
                   id="fillColor"
@@ -167,16 +188,20 @@ function ControlPanel() {
               </div>
             </div>
           </PanelSection>
-          <PanelSection label="Parts" show={showParts} setShow={setShowParts}>
-            <div className="flex flex-col gap-8">
+          <PanelSection
+            label="Parts"
+            show={showPanels.parts}
+            setShow={() => togglePane('parts')}
+          >
+            <div className="grid gap-8">
               <PanelSection
                 label="Eyes"
-                show={showEyes}
-                setShow={setShowEyes}
+                show={showPanels.eyes}
+                setShow={() => togglePane('eyes')}
                 isSubsection
               >
-                <div className="flex gap-6">
-                  <div className="grid w-1/2 gap-4">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="grid gap-4">
                     <Label htmlFor="parts-eyes-enabled">Eyes enabled</Label>
                     <Checkbox
                       id="parts-eyes-enabled"
@@ -188,7 +213,7 @@ function ControlPanel() {
                       }
                     />
                   </div>
-                  <div className="grid w-1/2 gap-4">
+                  <div className="grid gap-4">
                     <Label htmlFor="parts-eyes-hasPupils">Has pupils</Label>
                     <Checkbox
                       id="parts-eyes-hasPupils"
@@ -200,9 +225,7 @@ function ControlPanel() {
                       }
                     />
                   </div>
-                </div>
-                <div className="flex gap-6">
-                  <div className="grid w-1/2 gap-4">
+                  <div className="grid gap-4">
                     <Label htmlFor="parts-eyes-size">Size</Label>
                     <Input
                       id="parts-eyes-size"
@@ -219,7 +242,7 @@ function ControlPanel() {
                       }
                     />
                   </div>
-                  <div className="grid w-1/2 gap-4">
+                  <div className="grid gap-4">
                     <Label htmlFor="parts-eyes-color">Color</Label>
                     <Input
                       id="parts-eyes-color"
@@ -233,9 +256,7 @@ function ControlPanel() {
                       }
                     />
                   </div>
-                </div>
-                <div className="flex gap-6">
-                  <div className="grid gap-4 w-1/2">
+                  <div className="grid gap-4">
                     <Label htmlFor="parts-eyes-segmentIndex">
                       Segment index
                     </Label>
@@ -257,7 +278,7 @@ function ControlPanel() {
                       }
                     />
                   </div>
-                  <div className="grid gap-4 w-1/2">
+                  <div className="grid gap-4">
                     <Label htmlFor="parts-eyes-segmentOffset">
                       Segment offset
                     </Label>
@@ -279,41 +300,61 @@ function ControlPanel() {
                       }
                     />
                   </div>
+                  <div className="grid gap-4 col-span-2">
+                    <Label htmlFor="parts-eyes-angle">Angle</Label>
+                    <Slider
+                      id="parts-eyes-angle"
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      className="w-full"
+                      value={[parts.eyes.angle]}
+                      onValueChange={(value: number[]) =>
+                        setParts({ eyes: { ...parts.eyes, angle: value[0] } })
+                      }
+                    />
+                  </div>
                 </div>
+              </PanelSection>
+              <PanelSection
+                label="Tongue"
+                show={showPanels.tongue}
+                setShow={() => togglePane('tongue')}
+                isSubsection
+              >
                 <div className="grid gap-4">
-                  <Label htmlFor="parts-eyes-angle">Angle</Label>
-                  <Slider
-                    id="parts-eyes-angle"
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    className="w-full"
-                    value={[parts.eyes.angle]}
-                    onValueChange={(value: number[]) =>
-                      setParts({ eyes: { ...parts.eyes, angle: value[0] } })
+                  <Label htmlFor="parts-tongue">Tongue</Label>
+                  <Checkbox
+                    id="parts-tongue"
+                    checked={parts.tongue}
+                    onCheckedChange={(checked) =>
+                      setParts({ tongue: !!checked })
                     }
                   />
                 </div>
               </PanelSection>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="parts-tongue"
-                  checked={parts?.tongue}
-                  onCheckedChange={(checked) => setParts({ tongue: !!checked })}
-                />
-                <Label htmlFor="parts-tongue">Tongue</Label>
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="parts-fins"
-                  checked={parts?.fins}
-                  onCheckedChange={(checked) => setParts({ fins: !!checked })}
-                />
-                <Label htmlFor="parts-fins">Fins</Label>
-              </div>
+              <PanelSection
+                label="Fins"
+                show={showPanels.fins}
+                setShow={() => togglePane('fins')}
+                isSubsection
+              >
+                <div className="grid gap-4">
+                  <Label htmlFor="parts-fins">Fins</Label>
+                  <Checkbox
+                    id="parts-fins"
+                    checked={parts.fins}
+                    onCheckedChange={(checked) => setParts({ fins: !!checked })}
+                  />
+                </div>
+              </PanelSection>
             </div>
           </PanelSection>
-          <PanelSection label="Debug" show={showDebug} setShow={setShowDebug}>
+          <PanelSection
+            label="Debug"
+            show={showPanels.debug}
+            setShow={() => togglePane('debug')}
+          >
             {config.debug && (
               <div className="flex flex-col gap-4">
                 {Object.entries(config.debug).map(([key, value]) => (
