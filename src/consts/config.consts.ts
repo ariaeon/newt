@@ -5,6 +5,13 @@ export const snakeConfig: ConfigState = {
     segmentAmount: 20,
     segmentDistance: 30,
     segmentSizes: [],
+    segmentSizeCurvePoints: [
+      { x: 0, y: 195, id: 1 },
+      { x: 25, y: 195, id: 2 },
+      { x: 35, y: 230, id: 3 },
+      { x: 250, y: 245, id: 4 },
+      { x: 300, y: 285, id: 5 },
+    ],
   },
   style: {
     strokeWidth: 2,
@@ -38,6 +45,13 @@ export const fishConfig: ConfigState = {
     segmentAmount: 10,
     segmentDistance: 50,
     segmentSizes: [],
+    segmentSizeCurvePoints: [
+      { x: 0, y: 100, id: 0 },
+      { x: 50, y: 120, id: 1 },
+      { x: 100, y: 80, id: 2 },
+      { x: 150, y: 90, id: 3 },
+      { x: 200, y: 110, id: 4 },
+    ],
   },
   style: {
     strokeWidth: 2,

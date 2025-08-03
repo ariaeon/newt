@@ -103,9 +103,9 @@ function ControlPanel() {
             id="preset-select"
             className="border rounded px-2 py-1 text-sm"
             onChange={(e) => {
-              const preset = presets[e.target.value as keyof typeof presets];
-              if (preset) {
-                useConfigStore.getState().setConfig(preset);
+              const presetName = e.target.value as keyof typeof presets;
+              if (presets[presetName]) {
+                useConfigStore.getState().setConfig(presets[presetName]);
               }
             }}
             defaultValue={Object.keys(presets)[0]}

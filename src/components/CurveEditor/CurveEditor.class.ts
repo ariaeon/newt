@@ -1,30 +1,33 @@
 //This curve editor is largely vibe coded, i take no credit for how good or bad it is
 //Time constraint, might reimplement later
 
-type Point = { x: number; y: number; id: number };
+import type { CurveEditorPoint } from '@/types';
 
 export class CurveEditorClass {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-  private points: Point[] = [
-    { x: 0, y: 195, id: 1 },
-    { x: 25, y: 195, id: 2 },
-    { x: 35, y: 230, id: 3 },
-    { x: 250, y: 245, id: 4 },
-    { x: 300, y: 285, id: 5 },
+  private points: CurveEditorPoint[] = [
+    { x: 0, y: 0, id: 0 },
+    { x: 100, y: 100, id: 1 },
+    { x: 200, y: 50, id: 2 },
+    { x: 300, y: 150, id: 3 },
+    { x: 400, y: 100, id: 4 },
+    { x: 500, y: 200, id: 5 },
   ];
   private dragId: number | null = null;
   private selectedId: number | null = null;
   private nextId: number = 6;
-  private onPointsChange?: (points: Point[]) => void;
+  private onPointsChange?: (points: CurveEditorPoint[]) => void;
 
   private readonly hitRadius = 12;
 
   constructor(
     canvas: HTMLCanvasElement,
-    onPointsChange?: (points: Point[]) => void
+    initialPoints: CurveEditorPoint[] = [],
+    onPointsChange?: (points: CurveEditorPoint[]) => void
   ) {
     this.canvas = canvas;
+    this.points = initialPoints.length > 0 ? initialPoints : this.points;
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('No 2D context');
     this.ctx = ctx;
@@ -32,6 +35,11 @@ export class CurveEditorClass {
     this.draw();
     this.attachEvents();
     window.addEventListener('keydown', this.handleKeyDown);
+    console.log(
+      'CurveEditor initialized with points:',
+      this.points,
+      initialPoints
+    );
   }
 
   /**
@@ -90,10 +98,10 @@ export class CurveEditorClass {
    * Catmull-Rom spline interpolation for a given t in [0,1].
    */
   private catmullRomInterpolate(
-    p0: Point,
-    p1: Point,
-    p2: Point,
-    p3: Point,
+    p0: CurveEditorPoint,
+    p1: CurveEditorPoint,
+    p2: CurveEditorPoint,
+    p3: CurveEditorPoint,
     t: number
   ) {
     const tt = t * t;

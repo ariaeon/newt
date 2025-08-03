@@ -13,11 +13,17 @@ export interface EyeConfig {
   color: string;
 }
 
+export interface CurveEditorPoint {
+  x: number;
+  y: number;
+  id: number;
+}
 export interface ConfigState {
   shape: {
     segmentAmount: number;
     segmentDistance: number;
     segmentSizes: number[];
+    segmentSizeCurvePoints: CurveEditorPoint[];
   };
   style: {
     strokeWidth: number;

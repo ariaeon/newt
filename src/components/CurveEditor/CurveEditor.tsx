@@ -12,6 +12,9 @@ function CurveEditor() {
   const segmentAmount = useConfigStore(
     (state) => state.config.shape.segmentAmount
   );
+  const initialPoints = useConfigStore(
+    (state) => state.config.shape.segmentSizeCurvePoints
+  );
 
   const calculateSegmentSizes = (segmentAmount: number): number[] => {
     const interval = CANVAS_WIDTH / (segmentAmount - 1);
@@ -29,6 +32,8 @@ function CurveEditor() {
       .setConfig({ shape: { ...prev.shape, segmentSizes: sizes } });
   };
 
+  const pointsKey = JSON.stringify(initialPoints);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -40,14 +45,24 @@ function CurveEditor() {
       const sizes = calculateSegmentSizes(segmentAmount);
       updateSegmentSizes(sizes);
     };
+    console.log('Initializing CurveEditor with points:', initialPoints);
 
-    curveEditorRef.current = new CurveEditorClass(canvas, onPointsChange);
+    if (curveEditorRef.current) {
+      curveEditorRef.current.destroy();
+      curveEditorRef.current = null;
+    }
+
+    curveEditorRef.current = new CurveEditorClass(
+      canvas,
+      JSON.parse(JSON.stringify(initialPoints)),
+      onPointsChange
+    );
     onPointsChange(); // Initialize sizes
     return () => {
       curveEditorRef.current?.destroy();
       curveEditorRef.current = null;
     };
-  }, []);
+  }, [pointsKey, initialPoints]);
 
   // When config changes
   useEffect(() => {
