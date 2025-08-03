@@ -24,14 +24,15 @@ export interface Segment extends Point {
 }
 
 let segments: Segment[];
-const MAX_BEND = Math.PI / 6; // 30 degrees, adjust as needed
 const TONGUE_LENGTH = 15;
+const strokeColor = '#F0F0F0';
+const strokeWidth = 2;
 
 function makeSegments(
   config: ConfigState,
   prevSegments: Segment[] = []
 ): Segment[] {
-  return Array.from({ length: config.shape.segmentAmount }, (_, i) => ({
+  return Array.from({ length: config.body.segmentAmount }, (_, i) => ({
     x: prevSegments[i]?.x || window.innerWidth / 2,
     y: prevSegments[i]?.y || window.innerHeight / 2,
     angle: prevSegments[i]?.angle || 0,
@@ -44,9 +45,9 @@ function makeSegments(
 
 export function draw() {
   const config = getConfig();
-  const { shape, style, parts } = config;
-  const { segmentAmount, segmentSizes, segmentDistance } = shape;
-  const { strokeColor, strokeWidth, fillBool, fillColor } = style;
+  const { body, parts } = config;
+  const { segmentAmount, segmentSizes, segmentDistance, fillColor, maxBend } =
+    body;
   const { eyes, tongue, fins } = parts;
 
   if (!segments || segments.length !== segmentAmount) {
@@ -83,7 +84,7 @@ export function draw() {
 
     const prevAngle = segments[i - 1].angle;
     const angleDiff = angleDifference(angle, prevAngle);
-    angle = prevAngle + Math.max(-MAX_BEND, Math.min(MAX_BEND, angleDiff));
+    angle = prevAngle + Math.max(-maxBend, Math.min(maxBend, angleDiff));
 
     const { x, y } = parametricCircle(segments[i - 1], segmentDistance, angle);
     segments[i] = { ...segments[i], x, y, angle };
@@ -114,15 +115,15 @@ export function draw() {
   }
 
   // Fins
-  if (fins) {
+  if (fins.enabled) {
     drawFins({
-      segment: segments[4],
-      fillColor: fillColor,
-      strokeColor: strokeColor,
-      strokeWidth: strokeWidth,
-      radiusX: 50,
-      radiusY: 20,
-      offsetAngle: 0.8,
+      segment: segments[fins.segmentIndex],
+      fillColor: fins.fillColor,
+      strokeColor,
+      strokeWidth,
+      radiusX: fins.radiusX,
+      radiusY: fins.radiusY,
+      offsetAngle: fins.angle,
     });
   }
 
@@ -150,7 +151,7 @@ export function draw() {
     k: 1,
     strokeColor,
     strokeWidth,
-    fillColor: fillBool ? fillColor : undefined,
+    fillColor,
   });
   drawDebugBody(points, config);
 

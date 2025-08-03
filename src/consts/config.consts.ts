@@ -1,10 +1,11 @@
 import type { ConfigState } from '@/types';
 
 export const snakeConfig: ConfigState = {
-  shape: {
+  body: {
     segmentAmount: 20,
     segmentDistance: 30,
     segmentSizes: [],
+    maxBend: Math.PI / 6, // 30 degrees
     segmentSizeCurvePoints: [
       { x: 0, y: 195, id: 1 },
       { x: 25, y: 195, id: 2 },
@@ -12,11 +13,6 @@ export const snakeConfig: ConfigState = {
       { x: 250, y: 245, id: 4 },
       { x: 300, y: 285, id: 5 },
     ],
-  },
-  style: {
-    strokeWidth: 2,
-    strokeColor: '#00FF00',
-    fillBool: true,
     fillColor: '#3f6e22',
   },
   parts: {
@@ -30,7 +26,14 @@ export const snakeConfig: ConfigState = {
       color: '#FFFFFF',
     },
     tongue: true,
-    fins: false,
+    fins: {
+      enabled: false,
+      segmentIndex: 4,
+      fillColor: '#3f6e22',
+      radiusX: 50,
+      radiusY: 20,
+      angle: 0.8,
+    },
   },
   debug: {
     drawAnchors: false,
@@ -41,22 +44,18 @@ export const snakeConfig: ConfigState = {
 };
 
 export const fishConfig: ConfigState = {
-  shape: {
-    segmentAmount: 10,
-    segmentDistance: 50,
+  body: {
+    segmentAmount: 15,
+    segmentDistance: 20,
     segmentSizes: [],
+    maxBend: Math.PI / 12,
     segmentSizeCurvePoints: [
-      { x: 0, y: 100, id: 0 },
-      { x: 50, y: 120, id: 1 },
-      { x: 100, y: 80, id: 2 },
-      { x: 150, y: 90, id: 3 },
-      { x: 200, y: 110, id: 4 },
+      { x: 0, y: 200, id: 0 },
+      { x: 40, y: 160, id: 1 },
+      { x: 100, y: 145, id: 2 },
+      { x: 180, y: 190, id: 3 },
+      { x: 300, y: 270, id: 4 },
     ],
-  },
-  style: {
-    strokeWidth: 2,
-    strokeColor: '#0000FF',
-    fillBool: true,
     fillColor: '#1e90ff',
   },
   parts: {
@@ -70,7 +69,14 @@ export const fishConfig: ConfigState = {
       color: '#FFFFFF',
     },
     tongue: false,
-    fins: true,
+    fins: {
+      enabled: true,
+      segmentIndex: 4,
+      fillColor: '#87CEEB',
+      radiusX: 50,
+      radiusY: 20,
+      angle: 0.8,
+    },
   },
   debug: {
     drawAnchors: false,
@@ -83,8 +89,10 @@ export const fishConfig: ConfigState = {
 export const ConfigOptions = {
   SEGMENT_AMOUNT_MIN: 5,
   SEGMENT_AMOUNT_MAX: 40,
-  SEGMENT_DISTANCE_MIN: 10,
+  SEGMENT_DISTANCE_MIN: 15,
   SEGMENT_DISTANCE_MAX: 40,
+  MAX_BEND_MIN: Math.PI / 12, // 15 degrees
+  MAX_BEND_MAX: Math.PI / 4, // 45 degrees
 };
 
 export const presets = {

@@ -5,8 +5,7 @@ import { create } from 'zustand';
 interface ConfigStore {
   config: ConfigState;
   setConfig: (config: Partial<ConfigState>) => void;
-  setShape: (shape: Partial<ConfigState['shape']>) => void;
-  setStyle: (style: Partial<ConfigState['style']>) => void;
+  setBody: (body: Partial<ConfigState['body']>) => void;
   setParts: (parts: Partial<ConfigState['parts']>) => void;
   setDebug: (debug: Partial<ConfigState['debug']>) => void;
 }
@@ -19,14 +18,9 @@ export const useConfigStore = create<ConfigStore>((set) => ({
       config: { ...state.config, ...config },
     })),
 
-  setShape: (shape) =>
+  setBody: (body) =>
     set((state) => ({
-      config: { ...state.config, shape: { ...state.config.shape, ...shape } },
-    })),
-
-  setStyle: (style) =>
-    set((state) => ({
-      config: { ...state.config, style: { ...state.config.style, ...style } },
+      config: { ...state.config, body: { ...state.config.body, ...body } },
     })),
 
   setParts: (parts) =>

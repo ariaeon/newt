@@ -3,7 +3,7 @@ export interface Point {
   y: number;
 }
 
-export interface EyeConfig {
+export interface EyesConfig {
   enabled: boolean;
   hasPupils: boolean;
   size: number;
@@ -13,28 +13,33 @@ export interface EyeConfig {
   color: string;
 }
 
+export interface FinsConfig {
+  enabled: boolean;
+  radiusX: number;
+  radiusY: number;
+  segmentIndex: number;
+  angle: number;
+  fillColor: string;
+}
+
 export interface CurveEditorPoint {
   x: number;
   y: number;
   id: number;
 }
 export interface ConfigState {
-  shape: {
+  body: {
     segmentAmount: number;
     segmentDistance: number;
+    fillColor: string;
     segmentSizes: number[];
+    maxBend: number;
     segmentSizeCurvePoints: CurveEditorPoint[];
   };
-  style: {
-    strokeWidth: number;
-    strokeColor: string;
-    fillBool: boolean;
-    fillColor: string;
-  };
   parts: {
-    eyes: EyeConfig;
+    eyes: EyesConfig;
     tongue: boolean;
-    fins: boolean;
+    fins: FinsConfig;
   };
   debug: {
     drawAnchors: boolean;

@@ -37,7 +37,7 @@ function PanelSection({
           {show ? <Minus /> : <Plus />}
         </Button>
       </div>
-      {show && <div className="flex flex-col gap-4 ml-4">{children}</div>}
+      {show && <div className="flex flex-col gap-4">{children}</div>}
     </div>
   );
 }

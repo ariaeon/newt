@@ -14,8 +14,7 @@ import PanelSection from './PanelSection';
 import { presets } from '@/consts/config.consts';
 
 const initialPanelState = {
-  style: true,
-  shape: true,
+  body: true,
   parts: true,
   eyes: false,
   tongue: false,
@@ -25,8 +24,7 @@ const initialPanelState = {
 
 function ControlPanel() {
   const config = useConfigStore((state) => state.config);
-  const setShape = useConfigStore((state) => state.setShape);
-  const setStyle = useConfigStore((state) => state.setStyle);
+  const setBody = useConfigStore((state) => state.setBody);
   const setParts = useConfigStore((state) => state.setParts);
   const setDebug = useConfigStore((state) => state.setDebug);
   const [configOpen, setConfigOpen] = useState(true);
@@ -36,8 +34,10 @@ function ControlPanel() {
     SEGMENT_AMOUNT_MAX,
     SEGMENT_DISTANCE_MIN,
     SEGMENT_DISTANCE_MAX,
+    MAX_BEND_MIN,
+    MAX_BEND_MAX,
   } = ConfigOptions;
-  const { shape, style, parts } = config;
+  const { body, parts } = config;
 
   const togglePane = (panel: string) => {
     setShowPanels((prev) => ({
@@ -119,9 +119,9 @@ function ControlPanel() {
         </div>
         <form>
           <PanelSection
-            label="Shape"
-            show={showPanels.shape}
-            setShow={() => togglePane('shape')}
+            label="Body"
+            show={showPanels.body}
+            setShow={() => togglePane('body')}
           >
             <div className="grid grid-cols-2 gap-6">
               <div className="grid gap-4 col-span-2">
@@ -133,9 +133,9 @@ function ControlPanel() {
                   step={1}
                   className="w-full"
                   onValueChange={(value: number[]) =>
-                    setShape({ segmentAmount: value[0] })
+                    setBody({ segmentAmount: value[0] })
                   }
-                  value={[shape.segmentAmount]}
+                  value={[body.segmentAmount]}
                 />
               </div>
               <div className="grid gap-4 col-span-2">
@@ -147,67 +147,39 @@ function ControlPanel() {
                   step={1}
                   className="w-full"
                   onValueChange={(value: number[]) =>
-                    setShape({ segmentDistance: value[0] })
+                    setBody({ segmentDistance: value[0] })
                   }
-                  value={[shape.segmentDistance]}
+                  value={[body.segmentDistance]}
                 />
               </div>
-              <div className="col-span-2 grid gap-4">
-                <Label>Width</Label>
-                <CurveEditor />
-              </div>
-            </div>
-          </PanelSection>
-          <PanelSection
-            label="Style"
-            show={showPanels.style}
-            setShow={() => togglePane('style')}
-          >
-            <div className="grid grid-cols-2 gap-6">
-              <div className="grid gap-4">
-                <Label htmlFor="strokeWidth">Stroke width</Label>
-                <Input
-                  id="strokeWidth"
-                  type="number"
+              <div className="grid gap-4 col-span-2">
+                <Label htmlFor="maxBend">Flexibility</Label>
+                <Slider
+                  id="maxBend"
+                  min={MAX_BEND_MIN}
+                  max={MAX_BEND_MAX}
+                  step={0.01}
                   className="w-full"
-                  min={1}
-                  max={10}
-                  step={1}
-                  value={style.strokeWidth}
-                  onChange={(e) =>
-                    setStyle({ strokeWidth: Number(e.target.value) })
+                  onValueChange={(value: number[]) =>
+                    setBody({ maxBend: value[0] })
                   }
+                  value={[body.maxBend]}
                 />
               </div>
               <div className="grid gap-4">
-                <Label htmlFor="strokeColor">Stroke color</Label>
-                <Input
-                  id="strokeColor"
-                  type="color"
-                  className="w-full h-8 p-0 border-none bg-transparent"
-                  value={style.strokeColor}
-                  onChange={(e) => setStyle({ strokeColor: e.target.value })}
-                />
-              </div>
-              <div className="grid gap-4">
-                <Label htmlFor="fillBool">Fill </Label>
-                <Checkbox
-                  id="fillBool"
-                  checked={style.fillBool}
-                  onCheckedChange={(checked) =>
-                    setStyle({ fillBool: !!checked })
-                  }
-                />
-              </div>
-              <div className="grid gap-4">
-                <Label htmlFor="fillColor">Fill color</Label>
+                <Label htmlFor="fillColor">Color</Label>
                 <Input
                   id="fillColor"
                   type="color"
                   className="w-full h-8 p-0 border-none bg-transparent"
-                  value={style.fillColor}
-                  onChange={(e) => setStyle({ fillColor: e.target.value })}
+                  value={body.fillColor}
+                  onChange={(e) => setBody({ fillColor: e.target.value })}
                 />
+              </div>
+
+              <div className="col-span-2 grid gap-4">
+                <Label>Body thickness curve</Label>
+                <CurveEditor />
               </div>
             </div>
           </PanelSection>
@@ -225,7 +197,7 @@ function ControlPanel() {
               >
                 <div className="grid grid-cols-2 gap-6">
                   <div className="grid gap-4">
-                    <Label htmlFor="parts-eyes-enabled">Eyes enabled</Label>
+                    <Label htmlFor="parts-eyes-enabled">Enabled</Label>
                     <Checkbox
                       id="parts-eyes-enabled"
                       checked={parts.eyes.enabled}
@@ -237,7 +209,7 @@ function ControlPanel() {
                     />
                   </div>
                   <div className="grid gap-4">
-                    <Label htmlFor="parts-eyes-hasPupils">Has pupils</Label>
+                    <Label htmlFor="parts-eyes-hasPupils">Pupils</Label>
                     <Checkbox
                       id="parts-eyes-hasPupils"
                       checked={parts.eyes.hasPupils}
@@ -287,7 +259,7 @@ function ControlPanel() {
                       id="parts-eyes-segmentIndex"
                       type="number"
                       min={0}
-                      max={shape.segmentAmount - 1}
+                      max={body.segmentAmount - 1}
                       step={1}
                       className="w-full"
                       value={parts.eyes.segmentIndex}
@@ -362,13 +334,107 @@ function ControlPanel() {
                 setShow={() => togglePane('fins')}
                 isSubsection
               >
-                <div className="grid gap-4">
-                  <Label htmlFor="parts-fins">Fins</Label>
-                  <Checkbox
-                    id="parts-fins"
-                    checked={parts.fins}
-                    onCheckedChange={(checked) => setParts({ fins: !!checked })}
-                  />
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="grid gap-4">
+                    <Label htmlFor="parts-fins-enabled">Fins enabled</Label>
+                    <Checkbox
+                      id="parts-fins-enabled"
+                      checked={parts.fins.enabled}
+                      onCheckedChange={(checked) =>
+                        setParts({
+                          fins: { ...parts.fins, enabled: !!checked },
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-4">
+                    <Label htmlFor="parts-fins-segmentIndex">
+                      Segment index
+                    </Label>
+                    <Input
+                      id="parts-fins-segmentIndex"
+                      type="number"
+                      min={0}
+                      max={body.segmentAmount - 1}
+                      step={1}
+                      className="w-full"
+                      value={parts.fins.segmentIndex}
+                      onChange={(e) =>
+                        setParts({
+                          fins: {
+                            ...parts.fins,
+                            segmentIndex: Number(e.target.value),
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-4">
+                    <Label htmlFor="parts-fins-fillColor">Fill color</Label>
+                    <Input
+                      id="parts-fins-fillColor"
+                      type="color"
+                      className="w-full h-8 p-0 border-none bg-transparent"
+                      value={parts.fins.fillColor}
+                      onChange={(e) =>
+                        setParts({
+                          fins: { ...parts.fins, fillColor: e.target.value },
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-4">
+                    <Label htmlFor="parts-fins-radiusX">Length</Label>
+                    <Slider
+                      id="parts-fins-radiusX"
+                      min={1}
+                      max={100}
+                      step={1}
+                      className="w-full"
+                      value={[parts.fins.radiusX]}
+                      onValueChange={(value: number[]) =>
+                        setParts({
+                          fins: {
+                            ...parts.fins,
+                            radiusX: value[0],
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-4">
+                    <Label htmlFor="parts-fins-radiusY">Width</Label>
+                    <Slider
+                      id="parts-fins-radiusY"
+                      min={1}
+                      max={100}
+                      step={1}
+                      className="w-full"
+                      value={[parts.fins.radiusY]}
+                      onValueChange={(value: number[]) =>
+                        setParts({
+                          fins: {
+                            ...parts.fins,
+                            radiusY: value[0],
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-4 col-span-2">
+                    <Label htmlFor="parts-fins-angle">Angle</Label>
+                    <Slider
+                      id="parts-fins-angle"
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      className="w-full"
+                      value={[parts.fins.angle]}
+                      onValueChange={(value: number[]) =>
+                        setParts({ fins: { ...parts.fins, angle: value[0] } })
+                      }
+                    />
+                  </div>
                 </div>
               </PanelSection>
             </div>
