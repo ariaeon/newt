@@ -13,17 +13,22 @@ import type { ConfigState } from '@/types';
 import { getCustomAnchors, getSideAnchors } from './helpers/anchors.util.ts';
 import { angleDifference, parametricCircle } from './helpers/math.util.ts';
 
-let segments: Point[];
+interface Segment extends Point {
+  angle: number;
+}
+
+let segments: Segment[];
 const MAX_BEND = Math.PI / 6; // 30 degrees, adjust as needed
 const TONGUE_LENGTH = 15;
 
 function makeSegments(
   config: ConfigState,
-  prevSegments: Point[] = []
-): Point[] {
+  prevSegments: Segment[] = []
+): Segment[] {
   return Array.from({ length: config.shape.segmentAmount }, (_, i) => ({
     x: prevSegments[i]?.x || window.innerWidth / 2,
     y: prevSegments[i]?.y || window.innerHeight / 2,
+    angle: prevSegments[i]?.angle || 0,
   }));
 }
 
@@ -41,14 +46,14 @@ export function draw() {
   }
 
   // This locks the head to the 2nd segment, intially thought it was a bug but it looks better for a snake
-  const headAngle = Math.atan2(
+  segments[0].angle = Math.atan2(
     segments[1].y - segments[0].y,
     segments[1].x - segments[0].x
   );
   const headAnchors = getCustomAnchors(
     segments[0],
     segmentSizes[0],
-    headAngle,
+    segments[0].angle,
     [Math.PI / 2, Math.PI * 0.75, Math.PI, -Math.PI * 0.75, -Math.PI / 2]
   );
   leftAnchors.push(...headAnchors.reverse());
@@ -58,22 +63,17 @@ export function draw() {
     drawDebugAnchors(anchor, config);
   });
 
-  const angleMap = new Map<number, number>();
-
   for (let i = 1; i < segments.length; i++) {
     const dx = segments[i].x - segments[i - 1].x;
     const dy = segments[i].y - segments[i - 1].y;
     let angle = Math.atan2(dy, dx); // radians
 
-    if (angleMap.has(i - 1)) {
-      const prevAngle = angleMap.get(i - 1)!;
-      const angleDiff = angleDifference(angle, prevAngle);
-      angle = prevAngle + Math.max(-MAX_BEND, Math.min(MAX_BEND, angleDiff));
-    }
+    const prevAngle = segments[i - 1].angle;
+    const angleDiff = angleDifference(angle, prevAngle);
+    angle = prevAngle + Math.max(-MAX_BEND, Math.min(MAX_BEND, angleDiff));
 
     const { x, y } = parametricCircle(segments[i - 1], segmentDistance, angle);
-    segments[i] = { x, y };
-    angleMap.set(i, angle);
+    segments[i] = { ...segments[i], x, y, angle };
 
     // Use the generic one here maybe? less readable
     const { left, right } = getSideAnchors(segments[i], segmentSizes[i], angle);
@@ -104,7 +104,7 @@ export function draw() {
   if (tongue) {
     drawTongue({
       anchor: headAnchors[2],
-      angle: headAngle + Math.PI,
+      angle: segments[0].angle + Math.PI,
       length: TONGUE_LENGTH,
     });
   }
@@ -132,7 +132,7 @@ export function draw() {
     const eyeAnchors = getCustomAnchors(
       segments[i],
       segmentSizes[i] * offset,
-      i === 0 ? headAngle : angleMap.get(i) || 0,
+      segments[i].angle,
       [Math.PI * angle, -Math.PI * angle]
     );
     drawEyes({
@@ -140,7 +140,7 @@ export function draw() {
       radius: size,
       fillColor: '#FFFFFF',
       hasPupils: hasPupils,
-      headAngle: i === 0 ? headAngle : angleMap.get(i) || 0,
+      headAngle: segments[i].angle,
     });
     drawDebugAnchors(eyeAnchors[0], config);
     drawDebugAnchors(eyeAnchors[1], config);
