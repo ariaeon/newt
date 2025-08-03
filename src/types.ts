@@ -14,7 +14,6 @@ export interface EyesConfig {
 }
 
 export interface FinsConfig {
-  enabled: boolean;
   radiusX: number;
   radiusY: number;
   segmentIndex: number;
@@ -39,7 +38,7 @@ export interface ConfigState {
   parts: {
     eyes: EyesConfig;
     tongue: boolean;
-    fins: FinsConfig;
+    fins: FinsConfig[];
   };
   debug: {
     drawAnchors: boolean;

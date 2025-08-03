@@ -115,17 +115,19 @@ export function draw() {
   }
 
   // Fins
-  if (fins.enabled) {
-    drawFins({
-      segment: segments[fins.segmentIndex],
-      fillColor: fins.fillColor,
-      strokeColor,
-      strokeWidth,
-      radiusX: fins.radiusX,
-      radiusY: fins.radiusY,
-      offsetAngle: fins.angle,
-    });
-  }
+  fins.forEach((fin) => {
+    if (segments[fin.segmentIndex]) {
+      drawFins({
+        segment: segments[fin.segmentIndex],
+        fillColor: fin.fillColor,
+        strokeColor,
+        strokeWidth,
+        radiusX: fin.radiusX,
+        radiusY: fin.radiusY,
+        offsetAngle: fin.angle,
+      });
+    }
+  });
 
   // Tongue
   if (tongue) {

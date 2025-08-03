@@ -4,6 +4,7 @@ export const snakeConfig: ConfigState = {
   body: {
     segmentAmount: 20,
     segmentDistance: 30,
+    // TODO get rid of these, calculate from the curve points in the draw?
     segmentSizes: [],
     maxBend: Math.PI / 6, // 30 degrees
     segmentSizeCurvePoints: [
@@ -26,14 +27,7 @@ export const snakeConfig: ConfigState = {
       color: '#FFFFFF',
     },
     tongue: true,
-    fins: {
-      enabled: false,
-      segmentIndex: 4,
-      fillColor: '#3f6e22',
-      radiusX: 50,
-      radiusY: 20,
-      angle: 0.8,
-    },
+    fins: [],
   },
   debug: {
     drawAnchors: false,
@@ -69,14 +63,22 @@ export const fishConfig: ConfigState = {
       color: '#FFFFFF',
     },
     tongue: false,
-    fins: {
-      enabled: true,
-      segmentIndex: 4,
-      fillColor: '#87CEEB',
-      radiusX: 50,
-      radiusY: 20,
-      angle: 0.8,
-    },
+    fins: [
+      {
+        segmentIndex: 4,
+        fillColor: '#87CEEB',
+        radiusX: 50,
+        radiusY: 20,
+        angle: 0.8,
+      },
+      {
+        segmentIndex: 11,
+        fillColor: '#87CEEB',
+        radiusX: 25,
+        radiusY: 10,
+        angle: 0.8,
+      },
+    ],
   },
   debug: {
     drawAnchors: false,

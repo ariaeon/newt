@@ -4,7 +4,7 @@ import { Label } from '@/components/base/label';
 import { Slider } from '@/components/base/slider';
 import { Input } from '@/components/base/input';
 import { Button } from '@/components/base/button';
-import { SlidersHorizontal, X } from 'lucide-react';
+import { Plus, SlidersHorizontal, X } from 'lucide-react';
 import { Checkbox } from '@/components/base/checkbox';
 import { useConfigStore } from '@/store';
 
@@ -334,107 +334,163 @@ function ControlPanel() {
                 setShow={() => togglePane('fins')}
                 isSubsection
               >
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="grid gap-4">
-                    <Label htmlFor="parts-fins-enabled">Fins enabled</Label>
-                    <Checkbox
-                      id="parts-fins-enabled"
-                      checked={parts.fins.enabled}
-                      onCheckedChange={(checked) =>
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">
+                      {parts.fins.length} fin
+                      {parts.fins.length !== 1 ? 's' : ''}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const newFin = {
+                          segmentIndex: Math.floor(body.segmentAmount / 2),
+                          fillColor: '#87CEEB',
+                          radiusX: 50,
+                          radiusY: 20,
+                          angle: 0.8,
+                        };
                         setParts({
-                          fins: { ...parts.fins, enabled: !!checked },
-                        })
-                      }
-                    />
+                          fins: [...parts.fins, newFin],
+                        });
+                      }}
+                    >
+                      <Plus /> Add fin
+                    </Button>
                   </div>
-                  <div className="grid gap-4">
-                    <Label htmlFor="parts-fins-segmentIndex">
-                      Segment index
-                    </Label>
-                    <Input
-                      id="parts-fins-segmentIndex"
-                      type="number"
-                      min={0}
-                      max={body.segmentAmount - 1}
-                      step={1}
-                      className="w-full"
-                      value={parts.fins.segmentIndex}
-                      onChange={(e) =>
-                        setParts({
-                          fins: {
-                            ...parts.fins,
-                            segmentIndex: Number(e.target.value),
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="grid gap-4">
-                    <Label htmlFor="parts-fins-fillColor">Fill color</Label>
-                    <Input
-                      id="parts-fins-fillColor"
-                      type="color"
-                      className="w-full h-8 p-0 border-none bg-transparent"
-                      value={parts.fins.fillColor}
-                      onChange={(e) =>
-                        setParts({
-                          fins: { ...parts.fins, fillColor: e.target.value },
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="grid gap-4">
-                    <Label htmlFor="parts-fins-radiusX">Length</Label>
-                    <Slider
-                      id="parts-fins-radiusX"
-                      min={1}
-                      max={100}
-                      step={1}
-                      className="w-full"
-                      value={[parts.fins.radiusX]}
-                      onValueChange={(value: number[]) =>
-                        setParts({
-                          fins: {
-                            ...parts.fins,
-                            radiusX: value[0],
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="grid gap-4">
-                    <Label htmlFor="parts-fins-radiusY">Width</Label>
-                    <Slider
-                      id="parts-fins-radiusY"
-                      min={1}
-                      max={100}
-                      step={1}
-                      className="w-full"
-                      value={[parts.fins.radiusY]}
-                      onValueChange={(value: number[]) =>
-                        setParts({
-                          fins: {
-                            ...parts.fins,
-                            radiusY: value[0],
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="grid gap-4 col-span-2">
-                    <Label htmlFor="parts-fins-angle">Angle</Label>
-                    <Slider
-                      id="parts-fins-angle"
-                      min={0}
-                      max={1}
-                      step={0.01}
-                      className="w-full"
-                      value={[parts.fins.angle]}
-                      onValueChange={(value: number[]) =>
-                        setParts({ fins: { ...parts.fins, angle: value[0] } })
-                      }
-                    />
-                  </div>
+
+                  {parts.fins.map((fin, index) => (
+                    <div
+                      key={index}
+                      className="border rounded-lg p-4 space-y-4"
+                    >
+                      <div className="flex justify-between items-center">
+                        <h4 className="font-medium">Fin {index + 1}</h4>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="text-destructive"
+                          onClick={() => {
+                            const newFins = parts.fins.filter(
+                              (_, i) => i !== index
+                            );
+                            setParts({ fins: newFins });
+                          }}
+                        >
+                          <X />
+                        </Button>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="grid gap-4">
+                          <Label htmlFor={`parts-fins-${index}-segmentIndex`}>
+                            Segment index
+                          </Label>
+                          <Input
+                            id={`parts-fins-${index}-segmentIndex`}
+                            type="number"
+                            min={0}
+                            max={body.segmentAmount - 1}
+                            step={1}
+                            className="w-full"
+                            value={fin.segmentIndex}
+                            onChange={(e) => {
+                              const newFins = [...parts.fins];
+                              newFins[index] = {
+                                ...newFins[index],
+                                segmentIndex: Number(e.target.value),
+                              };
+                              setParts({ fins: newFins });
+                            }}
+                          />
+                        </div>
+                        <div className="grid gap-4">
+                          <Label htmlFor={`parts-fins-${index}-fillColor`}>
+                            Fill color
+                          </Label>
+                          <Input
+                            id={`parts-fins-${index}-fillColor`}
+                            type="color"
+                            className="w-full h-8 p-0 border-none bg-transparent"
+                            value={fin.fillColor}
+                            onChange={(e) => {
+                              const newFins = [...parts.fins];
+                              newFins[index] = {
+                                ...newFins[index],
+                                fillColor: e.target.value,
+                              };
+                              setParts({ fins: newFins });
+                            }}
+                          />
+                        </div>
+                        <div className="grid gap-4">
+                          <Label htmlFor={`parts-fins-${index}-radiusX`}>
+                            Length
+                          </Label>
+                          <Slider
+                            id={`parts-fins-${index}-radiusX`}
+                            min={1}
+                            max={100}
+                            step={1}
+                            className="w-full"
+                            value={[fin.radiusX]}
+                            onValueChange={(value: number[]) => {
+                              const newFins = [...parts.fins];
+                              newFins[index] = {
+                                ...newFins[index],
+                                radiusX: value[0],
+                              };
+                              setParts({ fins: newFins });
+                            }}
+                          />
+                        </div>
+                        <div className="grid gap-4">
+                          <Label htmlFor={`parts-fins-${index}-radiusY`}>
+                            Width
+                          </Label>
+                          <Slider
+                            id={`parts-fins-${index}-radiusY`}
+                            min={1}
+                            max={100}
+                            step={1}
+                            className="w-full"
+                            value={[fin.radiusY]}
+                            onValueChange={(value: number[]) => {
+                              const newFins = [...parts.fins];
+                              newFins[index] = {
+                                ...newFins[index],
+                                radiusY: value[0],
+                              };
+                              setParts({ fins: newFins });
+                            }}
+                          />
+                        </div>
+                        <div className="grid gap-4 col-span-2">
+                          <Label htmlFor={`parts-fins-${index}-angle`}>
+                            Angle
+                          </Label>
+                          <Slider
+                            id={`parts-fins-${index}-angle`}
+                            min={0}
+                            max={1}
+                            step={0.01}
+                            className="w-full"
+                            value={[fin.angle]}
+                            onValueChange={(value: number[]) => {
+                              const newFins = [...parts.fins];
+                              newFins[index] = {
+                                ...newFins[index],
+                                angle: value[0],
+                              };
+                              setParts({ fins: newFins });
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </PanelSection>
             </div>
