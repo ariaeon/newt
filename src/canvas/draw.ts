@@ -15,6 +15,11 @@ import { angleDifference, parametricCircle } from './helpers/math.util.ts';
 
 interface Segment extends Point {
   angle: number;
+  customAnchors?: Point[];
+  sideAnchors?: {
+    left: Point;
+    right: Point;
+  };
 }
 
 let segments: Segment[];
@@ -34,8 +39,6 @@ function makeSegments(
 
 export function draw() {
   const config = getConfig();
-  const leftAnchors: Point[] = [];
-  const rightAnchors: Point[] = [];
   const { shape, style, parts } = config;
   const { segmentAmount, segmentSizes, segmentDistance } = shape;
   const { strokeColor, strokeWidth, fillBool, fillColor } = style;
@@ -50,16 +53,15 @@ export function draw() {
     segments[1].y - segments[0].y,
     segments[1].x - segments[0].x
   );
-  const headAnchors = getCustomAnchors(
+  segments[0].customAnchors = getCustomAnchors(
     segments[0],
     segmentSizes[0],
     segments[0].angle,
     [Math.PI / 2, Math.PI * 0.75, Math.PI, -Math.PI * 0.75, -Math.PI / 2]
   );
-  leftAnchors.push(...headAnchors.reverse());
 
   drawDebugSegment(segments[0], segmentSizes[0], config);
-  headAnchors.forEach((anchor) => {
+  segments[0].customAnchors.forEach((anchor) => {
     drawDebugAnchors(anchor, config);
   });
 
@@ -76,10 +78,11 @@ export function draw() {
     segments[i] = { ...segments[i], x, y, angle };
 
     // Use the generic one here maybe? less readable
-    const { left, right } = getSideAnchors(segments[i], segmentSizes[i], angle);
-
-    leftAnchors.push(left);
-    rightAnchors.push(right);
+    segments[i].sideAnchors = getSideAnchors(
+      segments[i],
+      segmentSizes[i],
+      angle
+    );
 
     // Tail anchors
     if (i === segments.length - 1) {
@@ -89,12 +92,12 @@ export function draw() {
         angle,
         [0]
       );
-      leftAnchors.push(...tailAnchors.reverse());
+      segments[i].customAnchors = tailAnchors;
       drawDebugAnchors(tailAnchors[0], config);
     }
 
-    drawDebugAnchors(left, config);
-    drawDebugAnchors(right, config);
+    drawDebugAnchors(segments[i].sideAnchors!.left, config);
+    drawDebugAnchors(segments[i].sideAnchors!.right, config);
 
     drawDebugSegment(segments[i], segmentSizes[i], config);
     drawDebugAngles(segments[i], segmentSizes[i], angle, config);
@@ -103,22 +106,30 @@ export function draw() {
   // Tongue
   if (tongue) {
     drawTongue({
-      anchor: headAnchors[2],
+      anchor: segments[0].customAnchors[2],
       angle: segments[0].angle + Math.PI,
       length: TONGUE_LENGTH,
     });
   }
 
   // Body
-  const rightReversed = [...rightAnchors].reverse();
+  const points: Point[] = [
+    ...segments[0].customAnchors.reverse(),
+    ...segments.slice(1).map((seg) => seg.sideAnchors!.left),
+    ...(segments[segments.length - 1].customAnchors || []),
+    ...segments
+      .slice(1)
+      .reverse()
+      .map((seg) => seg.sideAnchors!.right),
+  ];
   drawBodyCurve({
-    points: [...leftAnchors, ...rightReversed],
+    points,
     k: 1,
     strokeColor,
     strokeWidth,
     fillColor: fillBool ? fillColor : undefined,
   });
-  drawDebugBody([...leftAnchors, ...rightReversed], config);
+  drawDebugBody(points, config);
 
   // Eyes
   if (eyes && eyes.enabled) {
