@@ -138,7 +138,7 @@ function ControlPanel() {
                 <Input
                   id="strokeColor"
                   type="color"
-                  className="w-full"
+                  className="w-full h-8 p-0 border-none bg-transparent"
                   value={style.strokeColor}
                   onChange={(e) => setStyle({ strokeColor: e.target.value })}
                 />
@@ -160,7 +160,7 @@ function ControlPanel() {
                 <Input
                   id="fillColor"
                   type="color"
-                  className="w-full"
+                  className="w-full h-8 p-0 border-none bg-transparent"
                   value={style.fillColor}
                   onChange={(e) => setStyle({ fillColor: e.target.value })}
                 />
@@ -175,88 +175,112 @@ function ControlPanel() {
                 setShow={setShowEyes}
                 isSubsection
               >
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id="parts-eyes-enabled"
-                    checked={parts.eyes.enabled}
-                    onCheckedChange={(checked) =>
-                      setParts({ eyes: { ...parts.eyes, enabled: !!checked } })
-                    }
-                  />
-                  <Label htmlFor="parts-eyes-enabled">Eyes enabled</Label>
+                <div className="flex gap-6">
+                  <div className="grid w-1/2 gap-4">
+                    <Label htmlFor="parts-eyes-enabled">Eyes enabled</Label>
+                    <Checkbox
+                      id="parts-eyes-enabled"
+                      checked={parts.eyes.enabled}
+                      onCheckedChange={(checked) =>
+                        setParts({
+                          eyes: { ...parts.eyes, enabled: !!checked },
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="grid w-1/2 gap-4">
+                    <Label htmlFor="parts-eyes-hasPupils">Has pupils</Label>
+                    <Checkbox
+                      id="parts-eyes-hasPupils"
+                      checked={parts.eyes.hasPupils}
+                      onCheckedChange={(checked) =>
+                        setParts({
+                          eyes: { ...parts.eyes, hasPupils: !!checked },
+                        })
+                      }
+                    />
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id="parts-eyes-hasPupils"
-                    checked={parts.eyes.hasPupils}
-                    onCheckedChange={(checked) =>
-                      setParts({
-                        eyes: { ...parts.eyes, hasPupils: !!checked },
-                      })
-                    }
-                  />
-                  <Label htmlFor="parts-eyes-hasPupils">Has pupils</Label>
+                <div className="flex gap-6">
+                  <div className="grid w-1/2 gap-4">
+                    <Label htmlFor="parts-eyes-size">Size</Label>
+                    <Input
+                      id="parts-eyes-size"
+                      type="number"
+                      min={1}
+                      max={50}
+                      step={1}
+                      className="w-full"
+                      value={parts.eyes.size}
+                      onChange={(e) =>
+                        setParts({
+                          eyes: { ...parts.eyes, size: Number(e.target.value) },
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="grid w-1/2 gap-4">
+                    <Label htmlFor="parts-eyes-color">Color</Label>
+                    <Input
+                      id="parts-eyes-color"
+                      type="color"
+                      className="w-full h-8 p-0 border-none bg-transparent"
+                      value={parts.eyes.color}
+                      onChange={(e) =>
+                        setParts({
+                          eyes: { ...parts.eyes, color: e.target.value },
+                        })
+                      }
+                    />
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="parts-eyes-size">Size</Label>
-                  <Input
-                    id="parts-eyes-size"
-                    type="number"
-                    min={1}
-                    max={50}
-                    step={1}
-                    className="w-20"
-                    value={parts.eyes.size}
-                    onChange={(e) =>
-                      setParts({
-                        eyes: { ...parts.eyes, size: Number(e.target.value) },
-                      })
-                    }
-                  />
+                <div className="flex gap-6">
+                  <div className="grid gap-4 w-1/2">
+                    <Label htmlFor="parts-eyes-segmentIndex">
+                      Segment index
+                    </Label>
+                    <Input
+                      id="parts-eyes-segmentIndex"
+                      type="number"
+                      min={0}
+                      max={shape.segmentAmount - 1}
+                      step={1}
+                      className="w-full"
+                      value={parts.eyes.segmentIndex}
+                      onChange={(e) =>
+                        setParts({
+                          eyes: {
+                            ...parts.eyes,
+                            segmentIndex: Number(e.target.value),
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-4 w-1/2">
+                    <Label htmlFor="parts-eyes-segmentOffset">
+                      Segment offset
+                    </Label>
+                    <Input
+                      id="parts-eyes-segmentOffset"
+                      type="number"
+                      min={0}
+                      max={2}
+                      step={0.1}
+                      className="w-full"
+                      value={parts.eyes.segmentOffset}
+                      onChange={(e) =>
+                        setParts({
+                          eyes: {
+                            ...parts.eyes,
+                            segmentOffset: Number(e.target.value),
+                          },
+                        })
+                      }
+                    />
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="parts-eyes-segmentIndex">Segment index</Label>
-                  <Input
-                    id="parts-eyes-segmentIndex"
-                    type="number"
-                    min={0}
-                    max={shape.segmentAmount - 1}
-                    step={1}
-                    className="w-20"
-                    value={parts.eyes.segmentIndex}
-                    onChange={(e) =>
-                      setParts({
-                        eyes: {
-                          ...parts.eyes,
-                          segmentIndex: Number(e.target.value),
-                        },
-                      })
-                    }
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="parts-eyes-segmentOffset">
-                    Segment offset
-                  </Label>
-                  <Input
-                    id="parts-eyes-segmentOffset"
-                    type="number"
-                    min={0}
-                    max={2}
-                    step={0.1}
-                    className="w-24"
-                    value={parts.eyes.segmentOffset}
-                    onChange={(e) =>
-                      setParts({
-                        eyes: {
-                          ...parts.eyes,
-                          segmentOffset: Number(e.target.value),
-                        },
-                      })
-                    }
-                  />
-                </div>
-                <div className="flex items-center gap-2 w-full">
+                <div className="grid gap-4">
                   <Label htmlFor="parts-eyes-angle">Angle</Label>
                   <Slider
                     id="parts-eyes-angle"
@@ -267,20 +291,6 @@ function ControlPanel() {
                     value={[parts.eyes.angle]}
                     onValueChange={(value: number[]) =>
                       setParts({ eyes: { ...parts.eyes, angle: value[0] } })
-                    }
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="parts-eyes-color">Color</Label>
-                  <Input
-                    id="parts-eyes-color"
-                    type="color"
-                    className="w-10 h-8 p-0 border-none bg-transparent"
-                    value={parts.eyes.color}
-                    onChange={(e) =>
-                      setParts({
-                        eyes: { ...parts.eyes, color: e.target.value },
-                      })
                     }
                   />
                 </div>
