@@ -8,6 +8,7 @@ import {
   drawEyes,
   drawTongue,
   drawFins,
+  // drawLegs,
 } from './helpers/draw.util';
 import { getConfig } from '@/store/utils';
 import type { ConfigState } from '@/types';
@@ -24,35 +25,99 @@ export interface Segment extends Point {
 }
 
 let segments: Segment[];
+const legSegments: { left: Segment[]; right: Segment[] }[] = [];
 const TONGUE_LENGTH = 15;
 const strokeColor = '#F0F0F0';
 const strokeWidth = 2;
 
-function makeSegments(
-  config: ConfigState,
-  prevSegments: Segment[] = []
-): Segment[] {
-  return Array.from({ length: config.body.segmentAmount }, (_, i) => ({
-    x: prevSegments[i]?.x || window.innerWidth / 2,
-    y: prevSegments[i]?.y || window.innerHeight / 2,
-    angle: prevSegments[i]?.angle || 0,
+function createSegment(x: number, y: number, angle: number): Segment {
+  return {
+    x,
+    y,
+    angle,
     sideAnchors: {
       left: { x: 0, y: 0 },
       right: { x: 0, y: 0 },
     },
-  }));
+  };
+}
+
+function makeSegmentsIfNeeded(
+  config: ConfigState,
+  prevSegments: Segment[] = []
+) {
+  if (!segments || segments.length !== config.body.segmentAmount) {
+    segments = [];
+    for (let i = 0; i < config.body.segmentAmount; i++) {
+      segments.push(
+        prevSegments[i] ||
+          createSegment(window.innerWidth / 2, window.innerHeight / 2, 0)
+      );
+    }
+  }
+}
+
+function makeLegsIfNeeded(config: ConfigState, segments: Segment[]) {
+  config.parts.legs.forEach((leg, legIndex) => {
+    if (segments[leg.segmentIndex]) {
+      const { left: anchorLeft, right: anchorRight } =
+        segments[leg.segmentIndex].sideAnchors;
+
+      if (
+        !legSegments[legIndex] ||
+        legSegments[legIndex].left.length !== leg.length ||
+        legSegments[legIndex].right.length !== leg.length
+      ) {
+        legSegments[legIndex] = {
+          left: [],
+          right: [],
+        };
+
+        for (let i = 0; i < leg.length; i++) {
+          legSegments[legIndex].left[i] = createSegment(
+            anchorLeft.x,
+            anchorLeft.y,
+            0
+          );
+        }
+
+        for (let i = 0; i < leg.length; i++) {
+          legSegments[legIndex].right[i] = createSegment(
+            anchorRight.x,
+            anchorRight.y,
+            0
+          );
+        }
+      }
+    }
+  });
+}
+
+function updateLegChain(legSegments: Segment[], segmentDistance: number) {
+  for (let i = 1; i < legSegments.length; i++) {
+    const prev = legSegments[i - 1];
+    const current = legSegments[i];
+
+    const dx = current.x - prev.x;
+    const dy = current.y - prev.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > segmentDistance) {
+      const ratio = segmentDistance / distance;
+      current.x = prev.x + dx * ratio;
+      current.y = prev.y + dy * ratio;
+    }
+  }
 }
 
 export function draw() {
   const config = getConfig();
   const { body, parts } = config;
-  const { segmentAmount, segmentSizes, segmentDistance, fillColor, maxBend } =
-    body;
+  const { segmentSizes, segmentDistance, fillColor, maxBend } = body;
   const { eyes, tongue, fins } = parts;
 
-  if (!segments || segments.length !== segmentAmount) {
-    segments = makeSegments(config, segments);
-  }
+  makeSegmentsIfNeeded(config, segments);
+  makeLegsIfNeeded(config, segments);
 
   // This locks the head to the 2nd segment, intially thought it was a bug but it looks better for a snake
   segments[0].angle = Math.atan2(
@@ -128,6 +193,48 @@ export function draw() {
       });
     }
   });
+
+  // Legs
+  if (config.parts.legs.length > 0) {
+    parts.legs.forEach((leg, legIndex) => {
+      if (segments[leg.segmentIndex] && legSegments[legIndex]) {
+        const currentLegPair = legSegments[legIndex];
+        const anchorPoints = segments[leg.segmentIndex].sideAnchors;
+
+        // Move first leg segments
+        const { left, right } = anchorPoints;
+        currentLegPair.left[0] = { ...currentLegPair.left[0], ...left };
+        currentLegPair.right[0] = { ...currentLegPair.right[0], ...right };
+
+        // Update chains for both left and right legs
+        const segmentDistance = leg.thickness;
+        updateLegChain(legSegments[legIndex].left, segmentDistance);
+        updateLegChain(legSegments[legIndex].right, segmentDistance);
+
+        // Draw left leg segments
+        legSegments[legIndex].left.forEach((legSegment) => {
+          drawCircle({
+            x: legSegment.x,
+            y: legSegment.y,
+            radius: leg.thickness,
+            strokeColor: '#FFFFFF',
+            fillColor: leg.fillcolor,
+          });
+        });
+
+        // Draw right leg segments
+        legSegments[legIndex].right.forEach((legSegment) => {
+          drawCircle({
+            x: legSegment.x,
+            y: legSegment.y,
+            radius: leg.thickness,
+            strokeColor: '#FFFFFF',
+            fillColor: leg.fillcolor,
+          });
+        });
+      }
+    });
+  }
 
   // Tongue
   if (tongue) {

@@ -21,6 +21,13 @@ export interface FinsConfig {
   fillColor: string;
 }
 
+export interface LegsConfig {
+  segmentIndex: number;
+  length: number;
+  thickness: number;
+  fillcolor?: string;
+}
+
 export interface CurveEditorPoint {
   x: number;
   y: number;
@@ -39,6 +46,7 @@ export interface ConfigState {
     eyes: EyesConfig;
     tongue: boolean;
     fins: FinsConfig[];
+    legs: LegsConfig[];
   };
   debug: {
     drawAnchors: boolean;

@@ -366,3 +366,37 @@ export const drawFins = ({
     fillColor,
   });
 };
+
+interface DrawLegsOptions {
+  segment: Segment;
+  radius?: number;
+  strokeColor?: string;
+  strokeWidth?: number;
+}
+
+export const drawLegs = ({
+  segment,
+  radius = 20,
+  strokeColor = '#FF0000',
+  strokeWidth = 2,
+}: DrawLegsOptions) => {
+  const ctx = getCtx();
+  if (!ctx) return;
+
+  const { left, right } = segment.sideAnchors!;
+
+  drawCircle({
+    x: left.x,
+    y: left.y,
+    radius,
+    strokeColor,
+    strokeWidth,
+  });
+  drawCircle({
+    x: right.x,
+    y: right.y,
+    radius,
+    strokeColor,
+    strokeWidth,
+  });
+};

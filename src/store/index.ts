@@ -1,4 +1,4 @@
-import { snakeConfig } from '@/consts/config.consts.ts';
+import { snakeConfig } from '@/consts/snake.consts.ts';
 import type { ConfigState } from '@/types';
 import { create } from 'zustand';
 

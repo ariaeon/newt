@@ -19,6 +19,7 @@ const initialPanelState = {
   eyes: false,
   tongue: false,
   fins: false,
+  legs: false,
   debug: false,
 };
 
@@ -408,7 +409,7 @@ function ControlPanel() {
                         </div>
                         <div className="grid gap-4">
                           <Label htmlFor={`parts-fins-${index}-fillColor`}>
-                            Fill color
+                            Color
                           </Label>
                           <Input
                             id={`parts-fins-${index}-fillColor`}
@@ -485,6 +486,149 @@ function ControlPanel() {
                                 angle: value[0],
                               };
                               setParts({ fins: newFins });
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </PanelSection>
+              <PanelSection
+                label="Legs"
+                show={showPanels.legs}
+                setShow={() => togglePane('legs')}
+                isSubsection
+              >
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">
+                      {parts.legs.length} leg
+                      {parts.legs.length !== 1 ? 's' : ''}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const newLeg = {
+                          segmentIndex: Math.floor(body.segmentAmount / 2),
+                          length: 30,
+                          thickness: 5,
+                          fillcolor: '#8B4513',
+                        };
+                        setParts({
+                          legs: [...parts.legs, newLeg],
+                        });
+                      }}
+                    >
+                      <Plus /> Add leg
+                    </Button>
+                  </div>
+
+                  {parts.legs.map((leg, index) => (
+                    <div
+                      key={index}
+                      className="border rounded-lg p-4 space-y-4"
+                    >
+                      <div className="flex justify-between items-center">
+                        <h4 className="font-medium">Leg {index + 1}</h4>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="text-destructive"
+                          onClick={() => {
+                            const newLegs = parts.legs.filter(
+                              (_, i) => i !== index
+                            );
+                            setParts({ legs: newLegs });
+                          }}
+                        >
+                          <X />
+                        </Button>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="grid gap-4">
+                          <Label htmlFor={`parts-legs-${index}-segmentIndex`}>
+                            Segment index
+                          </Label>
+                          <Input
+                            id={`parts-legs-${index}-segmentIndex`}
+                            type="number"
+                            min={0}
+                            max={body.segmentAmount - 1}
+                            step={1}
+                            className="w-full"
+                            value={leg.segmentIndex}
+                            onChange={(e) => {
+                              const newLegs = [...parts.legs];
+                              newLegs[index] = {
+                                ...newLegs[index],
+                                segmentIndex: Number(e.target.value),
+                              };
+                              setParts({ legs: newLegs });
+                            }}
+                          />
+                        </div>
+                        <div className="grid gap-4">
+                          <Label htmlFor={`parts-legs-${index}-length`}>
+                            Length
+                          </Label>
+                          <Slider
+                            id={`parts-legs-${index}-length`}
+                            min={1}
+                            max={100}
+                            step={1}
+                            className="w-full"
+                            value={[leg.length]}
+                            onValueChange={(value: number[]) => {
+                              const newLegs = [...parts.legs];
+                              newLegs[index] = {
+                                ...newLegs[index],
+                                length: value[0],
+                              };
+                              setParts({ legs: newLegs });
+                            }}
+                          />
+                        </div>
+                        <div className="grid gap-4">
+                          <Label htmlFor={`parts-legs-${index}-fillcolor`}>
+                            Color
+                          </Label>
+                          <Input
+                            id={`parts-legs-${index}-fillcolor`}
+                            type="color"
+                            className="w-full h-8 p-0 border-none bg-transparent"
+                            value={leg.fillcolor || '#8B4513'}
+                            onChange={(e) => {
+                              const newLegs = [...parts.legs];
+                              newLegs[index] = {
+                                ...newLegs[index],
+                                fillcolor: e.target.value,
+                              };
+                              setParts({ legs: newLegs });
+                            }}
+                          />
+                        </div>
+                        <div className="grid gap-4 col-span-2">
+                          <Label htmlFor={`parts-legs-${index}-thickness`}>
+                            Thickness
+                          </Label>
+                          <Slider
+                            id={`parts-legs-${index}-thickness`}
+                            min={1}
+                            max={20}
+                            step={1}
+                            className="w-full"
+                            value={[leg.thickness]}
+                            onValueChange={(value: number[]) => {
+                              const newLegs = [...parts.legs];
+                              newLegs[index] = {
+                                ...newLegs[index],
+                                thickness: value[0],
+                              };
+                              setParts({ legs: newLegs });
                             }}
                           />
                         </div>
