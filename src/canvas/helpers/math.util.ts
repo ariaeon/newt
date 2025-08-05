@@ -1,4 +1,5 @@
 import type { Point } from '@/types';
+import type { Segment } from '../draw';
 
 export function constrainDistance(
   point: Point,
@@ -28,9 +29,8 @@ export const parametricCircle = (
 };
 
 interface GetPointOnSegmentOptions {
-  segment: Point;
+  segment: Segment;
   distanceFromCenter: number;
-  segmentAngle: number;
   offsetAngle: number;
 }
 
@@ -38,13 +38,12 @@ interface GetPointOnSegmentOptions {
 export const getPointOnSegment = ({
   segment,
   distanceFromCenter,
-  segmentAngle,
   offsetAngle,
 }: GetPointOnSegmentOptions): Point => {
   return parametricCircle(
     segment,
     distanceFromCenter,
-    segmentAngle + offsetAngle
+    segment.angle + offsetAngle
   );
 };
 
@@ -53,4 +52,10 @@ export const angleDifference = (a: number, b: number): number => {
   while (diff < -Math.PI) diff += Math.PI * 2;
   while (diff > Math.PI) diff -= Math.PI * 2;
   return diff;
+};
+
+export const getAngle = (p1: Point, p2: Point): number => {
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  return Math.atan2(dy, dx);
 };

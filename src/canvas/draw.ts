@@ -13,7 +13,11 @@ import {
 import { getConfig } from '@/store/utils';
 import type { ConfigState } from '@/types';
 import { getCustomAnchors, getSideAnchors } from './helpers/anchors.util.ts';
-import { angleDifference, parametricCircle } from './helpers/math.util.ts';
+import {
+  angleDifference,
+  getAngle,
+  parametricCircle,
+} from './helpers/math.util.ts';
 
 export interface Segment extends Point {
   angle: number;
@@ -93,22 +97,25 @@ function makeLegsIfNeeded(config: ConfigState, segments: Segment[]) {
   });
 }
 
-function updateLegChain(legSegments: Segment[], segmentDistance: number) {
-  for (let i = 1; i < legSegments.length; i++) {
-    const prev = legSegments[i - 1];
-    const current = legSegments[i];
+const updateChainItemPosition = (
+  segments: Segment[],
+  i: number,
+  segmentDistance: number,
+  maxBend?: number
+) => {
+  const current = segments[i];
+  const prev = segments[i - 1];
 
-    const dx = current.x - prev.x;
-    const dy = current.y - prev.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+  let angle = getAngle(prev, current); // radians
 
-    if (distance > segmentDistance) {
-      const ratio = segmentDistance / distance;
-      current.x = prev.x + dx * ratio;
-      current.y = prev.y + dy * ratio;
-    }
+  if (maxBend) {
+    const angleDiff = angleDifference(angle, prev.angle);
+    angle = prev.angle + Math.max(-maxBend, Math.min(maxBend, angleDiff));
   }
-}
+
+  const { x, y } = parametricCircle(prev, segmentDistance, angle);
+  segments[i] = { ...segments[i], x, y, angle };
+};
 
 export function draw() {
   const config = getConfig();
@@ -120,22 +127,14 @@ export function draw() {
   makeLegsIfNeeded(config, segments);
 
   // This locks the head to the 2nd segment, intially thought it was a bug but it looks better for a snake
-  segments[0].angle = Math.atan2(
-    segments[1].y - segments[0].y,
-    segments[1].x - segments[0].x
-  );
+  segments[0].angle = getAngle(segments[0], segments[1]);
   // Head anchor calculations
-  segments[0].customAnchors = getCustomAnchors(
-    segments[0],
-    segmentSizes[0],
-    segments[0].angle,
-    [Math.PI * 0.75, Math.PI, -Math.PI * 0.75]
-  );
-  segments[0].sideAnchors = getSideAnchors(
-    segments[0],
-    segmentSizes[0],
-    segments[0].angle
-  );
+  segments[0].customAnchors = getCustomAnchors(segments[0], segmentSizes[0], [
+    Math.PI * 0.75,
+    Math.PI,
+    -Math.PI * 0.75,
+  ]);
+  segments[0].sideAnchors = getSideAnchors(segments[0], segmentSizes[0]);
 
   drawDebugSegment(segments[0], segmentSizes[0], config);
   segments[0].customAnchors.forEach((anchor) => {
@@ -143,31 +142,13 @@ export function draw() {
   });
 
   for (let i = 1; i < segments.length; i++) {
-    const dx = segments[i].x - segments[i - 1].x;
-    const dy = segments[i].y - segments[i - 1].y;
-    let angle = Math.atan2(dy, dx); // radians
+    updateChainItemPosition(segments, i, segmentDistance, maxBend);
 
-    const prevAngle = segments[i - 1].angle;
-    const angleDiff = angleDifference(angle, prevAngle);
-    angle = prevAngle + Math.max(-maxBend, Math.min(maxBend, angleDiff));
-
-    const { x, y } = parametricCircle(segments[i - 1], segmentDistance, angle);
-    segments[i] = { ...segments[i], x, y, angle };
-
-    segments[i].sideAnchors = getSideAnchors(
-      segments[i],
-      segmentSizes[i],
-      angle
-    );
+    segments[i].sideAnchors = getSideAnchors(segments[i], segmentSizes[i]);
 
     // Tail anchors
     if (i === segments.length - 1) {
-      const tailAnchors = getCustomAnchors(
-        segments[i],
-        segmentSizes[i],
-        angle,
-        [0]
-      );
+      const tailAnchors = getCustomAnchors(segments[i], segmentSizes[i], [0]);
       segments[i].customAnchors = tailAnchors;
       drawDebugAnchors(tailAnchors[0], config);
     }
@@ -176,7 +157,7 @@ export function draw() {
     drawDebugAnchors(segments[i].sideAnchors!.right, config);
 
     drawDebugSegment(segments[i], segmentSizes[i], config);
-    drawDebugAngles(segments[i], segmentSizes[i], angle, config);
+    drawDebugAngles(segments[i], segmentSizes[i], segments[i].angle, config);
   }
 
   // Fins
@@ -201,17 +182,20 @@ export function draw() {
         const currentLegPair = legSegments[legIndex];
         const anchorPoints = segments[leg.segmentIndex].sideAnchors;
 
-        // Move first leg segments
+        // Move leg anchors
         const { left, right } = anchorPoints;
         currentLegPair.left[0] = { ...currentLegPair.left[0], ...left };
         currentLegPair.right[0] = { ...currentLegPair.right[0], ...right };
 
-        // Update chains for both left and right legs
+        // Update chain
         const segmentDistance = leg.thickness;
-        updateLegChain(legSegments[legIndex].left, segmentDistance);
-        updateLegChain(legSegments[legIndex].right, segmentDistance);
+        for (let i = 1; i < currentLegPair.left.length; i++) {
+          updateChainItemPosition(currentLegPair.left, i, segmentDistance);
+        }
+        for (let i = 1; i < currentLegPair.right.length; i++) {
+          updateChainItemPosition(currentLegPair.right, i, segmentDistance);
+        }
 
-        // Draw left leg segments
         legSegments[legIndex].left.forEach((legSegment) => {
           drawCircle({
             x: legSegment.x,
@@ -273,12 +257,10 @@ export function draw() {
       size,
       hasPupils,
     } = eyes;
-    const eyeAnchors = getCustomAnchors(
-      segments[i],
-      segmentSizes[i] * offset,
-      segments[i].angle,
-      [Math.PI * angle, -Math.PI * angle]
-    );
+    const eyeAnchors = getCustomAnchors(segments[i], segmentSizes[i] * offset, [
+      Math.PI * angle,
+      -Math.PI * angle,
+    ]);
     drawEyes({
       anchors: eyeAnchors,
       radius: size,
